@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:paddingVertical="20dp"
+    android:paddingHorizontal="5dp"
+    android:id="@+id/containerLayout"
+    >
+
+    <CheckBox
+        android:id="@+id/cbSelect"
+        android:layout_width="50dp"
+        android:gravity="center"
+        android:layout_height="match_parent"
+        ></CheckBox>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/cbSelect"
+        android:gravity="center_vertical"
+        >
+        <TextView
+            android:id="@+id/txtQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="What would you like to drink?"
+            android:textSize="16sp"
+            android:scrollHorizontally="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            ></TextView>
+
+        <TextView
+            android:id="@+id/txtQuestionType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="Question type: image"
+            android:textSize="14sp"
+            android:textColor="@color/blue"
+            android:layout_below="@+id/txtQuestion"
+            ></TextView>
+    </RelativeLayout>
+
+</RelativeLayout>
