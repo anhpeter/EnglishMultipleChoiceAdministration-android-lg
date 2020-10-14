@@ -2,14 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="75dp"
-    android:background="@color/blue"
     android:id="@+id/containerLayout"
     tools:context="MainFragments.IndexTitleBarFragment">
 
+    <!-- default mode -->
     <RelativeLayout
         android:id="@+id/rltDefault"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/blue"
         android:gravity="center_vertical"
         >
         <Spinner
@@ -54,6 +55,7 @@
         android:id="@+id/rltSearchMode"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/blue"
         android:gravity="center_vertical"
         android:visibility="gone"
         >
@@ -91,6 +93,41 @@
 
             android:layout_alignParentRight="true"
             ></EditText>
+    </RelativeLayout>
+
+    <!-- select mode -->
+    <RelativeLayout
+        android:id="@+id/rltSelectMode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        >
+        <Button
+            android:id="@+id/btnBackInSelectMode"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+
+            android:text="@string/fa_icon_arrow_left"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:background="@android:color/transparent"
+            ></Button>
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+
+            android:text="@string/fa_icon_trash"
+            android:textColor="#fff"
+            android:textSize="20sp"
+
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            ></Button>
+
     </RelativeLayout>
 
 </RelativeLayout>

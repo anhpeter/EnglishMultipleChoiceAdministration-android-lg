@@ -31,9 +31,9 @@ import Helpers.Helper;
 
 public class IndexTitleBarFragment extends Fragment {
 
-
-    RelativeLayout rltDefault, rltSearchMode;
-    Button btnRightMenu, btnSearch, btnRunSearch, btnBack;
+    String fragmentName = "question-index-title-bar";
+    RelativeLayout rltDefault, rltSearchMode, rltSelectMode;
+    Button btnRightMenu, btnSearch, btnRunSearch, btnBack, btnBackInSelectMode, btnDelete;
     EditText edtSearch;
     Spinner spinnerController;
     View v;
@@ -71,7 +71,6 @@ public class IndexTitleBarFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 edtSearch.requestFocus();
-                rltDefault.setVisibility(View.GONE);
                 rltSearchMode.setVisibility(View.VISIBLE);
             }
         });
@@ -81,27 +80,34 @@ public class IndexTitleBarFragment extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Helper.hideKeyboard(getActivity());
-                rltSearchMode.setVisibility(View.GONE);
-                rltDefault.setVisibility(View.VISIBLE);
+                onBack();
+            }
+        });
+
+        btnBackInSelectMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBack();
             }
         });
     }
 
+    private void onBack(){
+        Helper.hideKeyboard(getActivity());
+        rltSearchMode.setVisibility(View.GONE);
+        rltSelectMode.setVisibility(View.GONE);
+    }
 
     private void initSpinner() {
-        final ArrayList<String> spinnerControllerArrayList = new ArrayList<>();
-        spinnerControllerArrayList.add("Hard question");
-        spinnerControllerArrayList.add("Medium question");
-        spinnerControllerArrayList.add("Easy question");
-        ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), R.layout.spinner_item, spinnerControllerArrayList);
+        String[] spinnerItems = {"Hard question", "Medium question", "Easy question"};
+        ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), R.layout.spinner_item, spinnerItems);
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         spinnerController.setAdapter(adapter);
         spinnerController.setSelection(getSpinnerItemPosition());
         spinnerController.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                fragmentCommunicate.communicate(getHashMapDataBySpinnerItemPosition(position));
+                fragmentCommunicate.communicate(getHashMapDataBySpinnerItemPosition(position), fragmentName);
             }
 
             @Override
@@ -157,8 +163,9 @@ public class IndexTitleBarFragment extends Fragment {
     private void setArguments() {
         Bundle bundle = getArguments();
         if (bundle != null) {
-            controller = bundle.getString("controller");
-            questionLevel = bundle.getString("questionLevel");
+            HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
+            controller = params.get("controller");
+            questionLevel = params.get("questionLevel");
             Log.d("xxx", "data received: " + controller + " - " + questionLevel);
         }
     }
@@ -166,10 +173,13 @@ public class IndexTitleBarFragment extends Fragment {
     private void mapping() {
         rltDefault = (RelativeLayout)  v.findViewById(R.id.rltDefault);
         rltSearchMode = (RelativeLayout)  v.findViewById(R.id.rltSearchMode);
+        rltSelectMode = (RelativeLayout)  v.findViewById(R.id.rltSelectMode);
         btnRightMenu = (Button) v.findViewById(R.id.btnRightMenu);
         btnSearch = (Button) v.findViewById(R.id.btnSearch);
         btnRunSearch = (Button) v.findViewById(R.id.btnRunSearch);
         btnBack = (Button) v.findViewById(R.id.btnBack);
+        btnDelete = (Button) v.findViewById(R.id.btnDelete);
+        btnBackInSelectMode = (Button) v.findViewById(R.id.btnBackInSelectMode);
         spinnerController = (Spinner) v.findViewById(R.id.spinnerController);
         edtSearch = (EditText) v.findViewById(R.id.edtSearch);
     }

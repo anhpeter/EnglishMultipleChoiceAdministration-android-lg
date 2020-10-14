@@ -1,0 +1,113 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/containerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context="MainFragments.QuestionFormFragment">
+
+    <EditText
+        android:id="@+id/edtQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="50dp"
+
+        android:hint="Question"></EditText>
+
+    <TextView
+        android:id="@+id/txtA"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/edtQuestion"
+        android:layout_marginTop="20dp"
+        android:text="A."
+
+        android:textColor="@color/blue"
+        android:textSize="20sp"></TextView>
+
+    <EditText
+        android:id="@+id/edtAnswerA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/txtA"
+        android:hint="Answer A"></EditText>
+
+    <TextView
+        android:id="@+id/txtB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/edtAnswerA"
+        android:layout_marginTop="10dp"
+        android:text="B."
+
+        android:textColor="@color/blue"
+        android:textSize="20sp"></TextView>
+
+    <EditText
+        android:id="@+id/edtAnswerB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtB"
+        android:hint="Answer B"
+
+        ></EditText>
+
+    <TextView
+        android:id="@+id/txtC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/edtAnswerB"
+        android:layout_marginTop="10dp"
+        android:text="C."
+
+        android:textColor="@color/blue"
+        android:textSize="20sp"></TextView>
+
+    <EditText
+        android:id="@+id/edtAnswerC"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/txtC"
+
+        android:hint="Answer C"></EditText>
+
+    <TextView
+        android:id="@+id/txtD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/edtAnswerC"
+        android:layout_marginTop="10dp"
+        android:text="D."
+
+        android:textColor="@color/blue"
+        android:textSize="20sp"></TextView>
+
+    <EditText
+        android:id="@+id/edtAnswerD"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/txtD"
+
+        android:hint="Answer D"></EditText>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/edtAnswerD"
+        android:layout_centerHorizontal="true"
+
+        android:layout_marginTop="50dp"
+        android:text="Submit"
+        android:textAllCaps="false"></Button>
+
+</RelativeLayout>

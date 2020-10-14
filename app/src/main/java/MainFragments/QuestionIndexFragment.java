@@ -7,8 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.multiple_choice.R;
@@ -16,6 +19,7 @@ import com.example.multiple_choice.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Defines.FragmentCommunicate;
 import Defines.ICallback;
 import Defines.Question;
 import Defines.QuestionAdapter;
@@ -24,10 +28,15 @@ import Models.QuestionModel;
 
 public class QuestionIndexFragment extends Fragment implements ICallback<Question> {
 
+    FragmentCommunicate fragmentCommunicate;
+    String fragmentName = "question-index";
+    QuestionModel questionModel;
     View v;
+
+    TextView txtMessage;
+    String questionLevel;
     Button btnAdd;
     ListView lvMain;
-    QuestionModel questionModel;
     ArrayList<Question> questionArrayList;
     QuestionAdapter questionAdapter;
 
@@ -43,16 +52,41 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
     }
 
     private void onInit(){
+        fragmentCommunicate = (FragmentCommunicate) getActivity();
+        setArguments();
         questionModel = new QuestionModel(getActivity(), this);
-        questionModel.listAll( "list-all");
         questionArrayList = new ArrayList<>();
+        onListAll();
         initListView();
         onAddClicked();
+    }
+
+    private void onListAll(){
+        HashMap<String, String> params = new HashMap<>();
+        params.put("level", questionLevel);
+        questionModel.listAll(params, "list-all");
     }
 
     private void initListView(){
         questionAdapter = new QuestionAdapter(getActivity(), R.layout.question_item_layout, questionArrayList);
         lvMain.setAdapter(questionAdapter);
+        setListViewEvents();
+    }
+
+    private void setListViewEvents(){
+        onListViewItemClick();
+    }
+
+    private void onListViewItemClick(){
+        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("id", questionArrayList.get(position).getId());
+                params.put("formType", "edit");
+                fragmentCommunicate.communicate(params, fragmentName);
+            }
+        });
     }
 
     private void onAddClicked(){
@@ -67,29 +101,47 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
     private void mapping(){
         btnAdd = (Button) v.findViewById(R.id.btnAdd);
         lvMain = (ListView) v.findViewById(R.id.lvMain);
+        txtMessage = (TextView) v.findViewById(R.id.txtMessage);
     }
 
-    public void onChangeData(HashMap<String, String> data){
-        Toast.makeText(getActivity(), "received data from index", Toast.LENGTH_SHORT).show();
+    public void onChangeData(HashMap<String, String> params){
+        if (params!=null){
+            questionLevel = params.get("questionLevel");
+            onListAll();
+        }
     }
 
     @Override
     public void itemCallBack(Question item, String tag) {
-
     }
 
     @Override
     public void listCallBack(ArrayList<Question> items, String tag) {
-        if (tag == "list-all") onListAll(items);
+        if (tag == "list-all") onListAllCallback(items);
     }
 
-    private void onListAll(ArrayList<Question> items){
-        Log.d("xxx", "list callback called");
+    private void onListAllCallback(ArrayList<Question> items){
+        Log.d("xxx", "list callback called, items size: "+items.size());
         questionArrayList.clear();
-        questionArrayList.addAll(items);
-        for (Question question: questionArrayList){
-            Log.d("xxx", question.getQuestion());
+        if (!items.isEmpty()){
+            txtMessage.setText("");
+            txtMessage.setVisibility(View.GONE);
+            lvMain.setVisibility(View.VISIBLE);
+            questionArrayList.addAll(items);
+        }else{
+            lvMain.setVisibility(View.GONE);
+            txtMessage.setText("There are no questions to show");
+            txtMessage.setVisibility(View.VISIBLE);
         }
         questionAdapter.notifyDataSetChanged();
     }
+
+    private void setArguments() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
+            questionLevel = params.get("questionLevel");
+        }
+    }
+
 }

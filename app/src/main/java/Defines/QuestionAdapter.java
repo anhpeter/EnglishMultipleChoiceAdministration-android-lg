@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.example.multiple_choice.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class QuestionAdapter extends BaseAdapter {
@@ -42,8 +44,7 @@ public class QuestionAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        TextView txtQuestion, txtQuestionType;
-        CheckBox cbSelect;
+        TextView txtQuestion, txtQuestionType, txtNo;
     }
 
     @Override
@@ -56,7 +57,7 @@ public class QuestionAdapter extends BaseAdapter {
 
             holder.txtQuestion  = (TextView) convertView.findViewById(R.id.txtQuestion);
             holder.txtQuestionType  = (TextView) convertView.findViewById(R.id.txtQuestionType);
-            holder.cbSelect  = (CheckBox) convertView.findViewById(R.id.cbSelect);
+            holder.txtNo  = (TextView) convertView.findViewById(R.id.txtNo);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
@@ -65,6 +66,7 @@ public class QuestionAdapter extends BaseAdapter {
         Question question = questionArrayList.get(position);
         holder.txtQuestion.setText(question.getQuestion());
         holder.txtQuestionType.setText("Question type: "+question.getQuestionType());
+        holder.txtNo.setText(position+1+"");
         Animation animScale = AnimationUtils.loadAnimation(context, R.anim.anim_scale_for_listview_item);
         convertView.startAnimation(animScale);
         return convertView;

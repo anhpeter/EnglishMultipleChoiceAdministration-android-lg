@@ -1,5 +1,8 @@
 package Defines;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.Calendar;
@@ -7,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class Question {
+
+    private String id;
     private String question;
     private String correctAnswer;
     private String answerA;
@@ -18,7 +23,8 @@ public class Question {
     private long created;
 
 
-    public Question(String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created) {
+        this.setId(id);
         this.setQuestion(question);
         this.setCorrectAnswer(correctAnswer);
         this.setAnswerA(answerA);
@@ -103,24 +109,37 @@ public class Question {
         else this.created = created;
     }
 
-    public static Question getQuestionByQueryDoc(QueryDocumentSnapshot queryDocumentSnapshot){
-        String question = queryDocumentSnapshot.getString("question");
-        String correctAnswer = queryDocumentSnapshot.getString("correctAnswer");
-        String answerA = queryDocumentSnapshot.getString("answerA");
-        String answerB = queryDocumentSnapshot.getString("answerB");
-        String answerC = queryDocumentSnapshot.getString("answerC");
-        String answerD = queryDocumentSnapshot.getString("answerD");
-        String questionType = queryDocumentSnapshot.getString("questionType");
-        String level = queryDocumentSnapshot.getString("level");
-        long created;
-        try{
-            created  = Integer.parseInt(queryDocumentSnapshot.getString("created"));
-        }catch (Exception e){
-            created = -1;
-        }
-        Question qt  = new Question(question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created);
-        return qt;
+    public String getId() {
+        return id;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+    public static Question getQuestionBySnapshot(DocumentSnapshot queryDocumentSnapshot){
+        if (queryDocumentSnapshot != null){
+            String id = queryDocumentSnapshot.getId();
+            String question = queryDocumentSnapshot.getString("question");
+            String correctAnswer = queryDocumentSnapshot.getString("correctAnswer");
+            String answerA = queryDocumentSnapshot.getString("answerA");
+            String answerB = queryDocumentSnapshot.getString("answerB");
+            String answerC = queryDocumentSnapshot.getString("answerC");
+            String answerD = queryDocumentSnapshot.getString("answerD");
+            String questionType = queryDocumentSnapshot.getString("questionType");
+            String level = queryDocumentSnapshot.getString("level");
+            long created;
+            try{
+                created  = Integer.parseInt(queryDocumentSnapshot.getString("created"));
+            }catch (Exception e){
+                created = -1;
+            }
+            Question qt  = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created);
+            return qt;
+        }else return null;
+    }
+
 
     public HashMap<String, String> getDocData(){
         HashMap<String, String> docData = new HashMap<>();
@@ -132,6 +151,7 @@ public class Question {
         docData.put("correctAnswer", getCorrectAnswer());
         docData.put("questionType", getQuestionType());
         docData.put("level", getLevel());
+        docData.put("created", getCreated()+"");
         return docData;
     }
 }

@@ -15,6 +15,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+import java.util.HashMap;
+
 import Defines.User;
 
 public abstract class Model {
@@ -47,6 +49,11 @@ public abstract class Model {
         });
     }
 
+    // ABSTRACT METHODS
+    abstract public void listAll(final HashMap<String, String> params, final String tag);
+
+    abstract public void getItemById(String id, final String tag);
+
     // GETTER & SETTER
     public FirebaseFirestore getDb(){
         return db;
@@ -71,6 +78,5 @@ public abstract class Model {
     public void setActivity(Activity activity) {
         this.activity = activity;
     }
-
 
 }
