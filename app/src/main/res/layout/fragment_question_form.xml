@@ -6,22 +6,34 @@
     android:padding="10dp"
     tools:context="MainFragments.QuestionFormFragment">
 
+     <!-- QUESTION -->
+    <TextView
+        android:id="@+id/txtQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:text="@string/fa_icon_question_circle"
+        android:textColor="@color/orange"
+        android:layout_marginTop="50dp"
+        android:textSize="20sp"></TextView>
+
     <EditText
         android:id="@+id/edtQuestion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_marginTop="50dp"
-
+        android:layout_alignBaseline="@id/txtQuestion"
+        android:layout_toRightOf="@id/txtQuestion"
+        android:layout_marginLeft="20dp"
         android:hint="Question"></EditText>
 
+    <!-- ANSWER -->
     <TextView
         android:id="@+id/txtA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
         android:layout_below="@id/edtQuestion"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:text="A."
 
         android:textColor="@color/blue"
@@ -32,8 +44,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_below="@+id/txtA"
-        android:hint="Answer A"></EditText>
+        android:layout_alignBaseline="@id/txtA"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/txtA"
+        android:hint="Answer"></EditText>
 
     <TextView
         android:id="@+id/txtB"
@@ -41,7 +55,7 @@
         android:layout_height="wrap_content"
 
         android:layout_below="@id/edtAnswerA"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="B."
 
         android:textColor="@color/blue"
@@ -51,10 +65,11 @@
         android:id="@+id/edtAnswerB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtB"
-        android:hint="Answer B"
 
-        ></EditText>
+        android:layout_alignBaseline="@id/txtB"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/txtB"
+        android:hint="Answer"></EditText>
 
     <TextView
         android:id="@+id/txtC"
@@ -62,7 +77,7 @@
         android:layout_height="wrap_content"
 
         android:layout_below="@id/edtAnswerB"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="C."
 
         android:textColor="@color/blue"
@@ -73,9 +88,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_below="@+id/txtC"
+        android:layout_alignBaseline="@id/txtC"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/txtC"
 
-        android:hint="Answer C"></EditText>
+        android:hint="Answer"></EditText>
 
     <TextView
         android:id="@+id/txtD"
@@ -83,7 +100,7 @@
         android:layout_height="wrap_content"
 
         android:layout_below="@id/edtAnswerC"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="D."
 
         android:textColor="@color/blue"
@@ -94,9 +111,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:layout_below="@+id/txtD"
+        android:layout_alignBaseline="@id/txtD"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/txtD"
 
-        android:hint="Answer D"></EditText>
+        android:hint="Answer"></EditText>
 
     <Button
         android:id="@+id/btnSubmit"
