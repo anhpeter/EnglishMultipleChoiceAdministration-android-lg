@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:id="@+id/containerLayout"
+    tools:context="MainFragments.QuestionFormTitleBarFragment">
+
+    <!-- select mode -->
+    <RelativeLayout
+        android:id="@+id/rltSelectMode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue"
+        android:gravity="center_vertical"
+        >
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+
+            android:text="@string/fa_icon_arrow_left"
+            android:textColor="#fff"
+            android:textSize="20sp"
+            android:background="@android:color/transparent"
+            ></Button>
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+
+            android:text="@string/fa_icon_trash"
+            android:textColor="#fff"
+            android:textSize="20sp"
+
+            android:layout_alignParentRight="true"
+            android:background="@android:color/transparent"
+            ></Button>
+
+    </RelativeLayout>
+
+</RelativeLayout>

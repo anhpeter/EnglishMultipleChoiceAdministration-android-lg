@@ -51,7 +51,7 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         return v;
     }
 
-    private void onInit(){
+    private void onInit() {
         fragmentCommunicate = (FragmentCommunicate) getActivity();
         setArguments();
         questionModel = new QuestionModel(getActivity(), this);
@@ -61,51 +61,56 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         onAddClicked();
     }
 
-    private void onListAll(){
+    private void onListAll() {
         HashMap<String, String> params = new HashMap<>();
         params.put("level", questionLevel);
         questionModel.listAll(params, "list-all");
     }
 
-    private void initListView(){
+    private void initListView() {
         questionAdapter = new QuestionAdapter(getActivity(), R.layout.question_item_layout, questionArrayList);
         lvMain.setAdapter(questionAdapter);
         setListViewEvents();
     }
 
-    private void setListViewEvents(){
+    private void setListViewEvents() {
         onListViewItemClick();
     }
 
-    private void onListViewItemClick(){
+    private void onListViewItemClick() {
         lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("id", questionArrayList.get(position).getId());
-                params.put("formType", "edit");
-                fragmentCommunicate.communicate(params, fragmentName);
+                requestForm(questionArrayList.get(position).getId());
             }
         });
     }
 
-    private void onAddClicked(){
+    private void onAddClicked() {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Toast.makeText(getActivity(), "add clicked", Toast.LENGTH_SHORT).show();
+                requestForm(null);
             }
         });
     }
 
-    private void mapping(){
+    private void requestForm(String id) {
+        String formType = (id == null) ? "add" : "edit";
+        HashMap<String, String> params = new HashMap<>();
+        params.put("id", id);
+        params.put("formType", formType);
+        fragmentCommunicate.communicate(params, fragmentName);
+    }
+
+    private void mapping() {
         btnAdd = (Button) v.findViewById(R.id.btnAdd);
         lvMain = (ListView) v.findViewById(R.id.lvMain);
         txtMessage = (TextView) v.findViewById(R.id.txtMessage);
     }
 
-    public void onChangeData(HashMap<String, String> params){
-        if (params!=null){
+    public void onChangeData(HashMap<String, String> params) {
+        if (params != null) {
             questionLevel = params.get("questionLevel");
             onListAll();
         }
@@ -120,15 +125,15 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         if (tag == "list-all") onListAllCallback(items);
     }
 
-    private void onListAllCallback(ArrayList<Question> items){
-        Log.d("xxx", "list callback called, items size: "+items.size());
+    private void onListAllCallback(ArrayList<Question> items) {
+        Log.d("xxx", "list callback called, items size: " + items.size());
         questionArrayList.clear();
-        if (!items.isEmpty()){
+        if (!items.isEmpty()) {
             txtMessage.setText("");
             txtMessage.setVisibility(View.GONE);
             lvMain.setVisibility(View.VISIBLE);
             questionArrayList.addAll(items);
-        }else{
+        } else {
             lvMain.setVisibility(View.GONE);
             txtMessage.setText("There are no questions to show");
             txtMessage.setVisibility(View.VISIBLE);

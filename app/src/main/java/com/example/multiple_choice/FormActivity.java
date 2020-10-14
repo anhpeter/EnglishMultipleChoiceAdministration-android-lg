@@ -17,6 +17,7 @@ import Defines.Question;
 import Helpers.Helper;
 import MainFragments.IndexTitleBarFragment;
 import MainFragments.QuestionFormFragment;
+import MainFragments.QuestionFormTitleBarFragment;
 import MainFragments.QuestionIndexFragment;
 
 public class FormActivity extends AppCompatActivity implements FragmentCommunicate{
@@ -58,14 +59,13 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
         Bundle b = new Bundle();
         b.putSerializable("params", myParams);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        // title bar
-        /*
-        IndexTitleBarFragment indexTitleBarFragment = new IndexTitleBarFragment();
-        indexTitleBarFragment.setArguments(b);
-        fragmentTransaction.add(R.id.indexTitleBarFrame, indexTitleBarFragment, "titleBar");
-         */
 
-        // index
+        // title bar
+        QuestionFormTitleBarFragment questionFormTitleBarFragment = new QuestionFormTitleBarFragment();
+        questionFormTitleBarFragment.setArguments(b);
+        fragmentTransaction.add(R.id.formTitleBarFrame, questionFormTitleBarFragment, "titleBar");
+
+        // form
         QuestionFormFragment questionFormFragment = new QuestionFormFragment();
         questionFormFragment.setArguments(b);
         fragmentTransaction.add(R.id.formFrame, questionFormFragment, "form");

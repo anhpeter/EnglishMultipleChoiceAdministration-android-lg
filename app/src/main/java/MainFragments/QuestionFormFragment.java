@@ -52,7 +52,6 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         fragmentCommunicate = (FragmentCommunicate) getActivity();
         questionModel = new QuestionModel(getActivity(), this);
         setArguments();
-
         onSubmitClick();
     }
 

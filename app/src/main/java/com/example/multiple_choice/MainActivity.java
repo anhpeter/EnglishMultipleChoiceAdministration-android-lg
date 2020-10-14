@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     }
 
     private void callUserFragments() {
-        Toast.makeText(this, "User Fragments Called", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -100,7 +99,10 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
             QuestionIndexFragment indexFragment = (QuestionIndexFragment) fragmentManager.findFragmentByTag("index");
 
             // if new question level # current => on change
-            if (questionLevel != newQuestionLevel) indexFragment.onChangeData(data);
+            if (!questionLevel.equals(newQuestionLevel)){
+                indexFragment.onChangeData(data);
+                questionLevel = newQuestionLevel;
+            }
             Toast.makeText(this, controller + " - " + questionLevel, Toast.LENGTH_SHORT).show();
         }
     }
@@ -112,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
         b.putSerializable("params", data);
         i.putExtra("package", b);
         startActivity(i);
-        Toast.makeText(this, "Question Index Send Params", Toast.LENGTH_SHORT).show();
     }
 
     @Override

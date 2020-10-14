@@ -40,6 +40,7 @@ public class QuestionModel extends Model {
 
     @Override
     public void listAll(final HashMap<String, String> params, final String tag) {
+        Log.d("xxx", "list-all params level: "+params.get("level"));
         db.collection(collection)
                 .whereIn("level", Arrays.asList(params.get("level")))
                 .orderBy("created", Query.Direction.DESCENDING)
@@ -50,7 +51,8 @@ public class QuestionModel extends Model {
                         if (value != null) {
                             for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
                                 Question qt = Question.getQuestionBySnapshot(queryDocumentSnapshot);
-                                for (int i = 0; i < 5; i++) questionArrayList.add(qt);
+                                //for (int i = 0; i < 5; i++)
+                                questionArrayList.add(qt);
                             }
                         }
                         iCallback.listCallBack(questionArrayList, tag);
