@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.example.multiple_choice.R;
 
@@ -23,5 +24,12 @@ public class Helper {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    public static void clearEditTextFocus(EditText edt){
+        edt.setFocusableInTouchMode(false);
+        edt.setFocusable(false);
+        edt.setFocusableInTouchMode(true);
+        edt.setFocusable(true);
     }
 }

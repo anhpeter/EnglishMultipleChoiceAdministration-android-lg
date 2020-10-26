@@ -12,6 +12,8 @@ import java.util.HashMap;
 public class Question {
 
     private String id;
+
+
     private String question;
     private String correctAnswer;
     private String answerA;
@@ -140,9 +142,8 @@ public class Question {
         }else return null;
     }
 
-
-    public HashMap<String, String> getDocData(){
-        HashMap<String, String> docData = new HashMap<>();
+    public HashMap<String, Object> getDocData(){
+        HashMap<String, Object> docData = new HashMap<>();
         docData.put("question", getQuestion());
         docData.put("answerA", getAnswerA());
         docData.put("answerB", getAnswerB());
@@ -154,4 +155,9 @@ public class Question {
         docData.put("created", getCreated()+"");
         return docData;
     }
+
+    public String getInfo(){
+        return getId()+ ", "+getQuestion()+", "+getQuestionType()+", "+getLevel()+", "+getCorrectAnswer()+", "+getAnswerA()+", "+getAnswerB()+", "+getAnswerC()+", "+getAnswerD()+", "+getCreated();
+    }
+
 }

@@ -40,25 +40,52 @@ public class QuestionModel extends Model {
 
     @Override
     public void listAll(final HashMap<String, String> params, final String tag) {
-        Log.d("xxx", "list-all params level: "+params.get("level"));
+        Log.d("xxx", "list-all params level: " + params.get("level"));
         db.collection(collection)
                 .whereIn("level", Arrays.asList(params.get("level")))
                 .orderBy("created", Query.Direction.DESCENDING)
-                .addSnapshotListener(activity, new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        ArrayList<Question> questionArrayList = new ArrayList<>();
-                        if (value != null) {
-                            for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                                Question qt = Question.getQuestionBySnapshot(queryDocumentSnapshot);
-                                //for (int i = 0; i < 5; i++)
-                                questionArrayList.add(qt);
-                            }
-                        }
-                        iCallback.listCallBack(questionArrayList, tag);
-                    }
-                });
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                ArrayList<Question> questionArrayList = new ArrayList<>();
+                for (QueryDocumentSnapshot queryDocumentSnapshot : queryDocumentSnapshots) {
+                    Question qt = Question.getQuestionBySnapshot(queryDocumentSnapshot);
+                    questionArrayList.add(qt);
+                }
+                iCallback.listCallBack(questionArrayList, tag);
+            }
+        });
     }
+
+    public void updateItem(final Question question, final String tag) {
+        db.collection(collection).document(question.getId()).update(question.getDocData()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                iCallback.itemCallBack(question, tag);
+            }
+        });
+    }
+
+    public void addItem(final Question question, final String tag) {
+        Map<String, Object> docData = question.getDocData();
+        db.collection(collection).add(question.getDocData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+                question.setId(documentReference.getId());
+                iCallback.itemCallBack(question, tag);
+            }
+        });
+    }
+
+    public void deleteItemById(final String id, final String tag) {
+        db.collection(collection).document(id).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                iCallback.itemCallBack(null, tag);
+            }
+        });
+    }
+
 
     @Override
     public void getItemById(String id, final String tag) {

@@ -25,6 +25,7 @@ import Defines.FragmentCommunicate;
 import Defines.User;
 import Helpers.Helper;
 import MainFragments.IndexTitleBarFragment;
+import MainFragments.QuestionFormFragment;
 import MainFragments.QuestionIndexFragment;
 
 public class MainActivity extends AppCompatActivity implements FragmentCommunicate {
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
 
     String controller;
     String questionLevel;
+    IndexTitleBarFragment indexTitleBarFragment;
+    QuestionIndexFragment questionIndexFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
 
     private void onInit() {
         controller = "questions";
-        questionLevel = "easy";
+        questionLevel = "eas1y";
         fragmentManager = getFragmentManager();
         Helper.initFontAwesome(getApplicationContext(), getWindow().getDecorView());
     }
@@ -65,12 +68,12 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
 
         // title bar
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        IndexTitleBarFragment indexTitleBarFragment = new IndexTitleBarFragment();
+        indexTitleBarFragment = new IndexTitleBarFragment();
         indexTitleBarFragment.setArguments(b);
         fragmentTransaction.add(R.id.indexTitleBarFrame, indexTitleBarFragment, "titleBar");
 
         // index
-        QuestionIndexFragment questionIndexFragment = new QuestionIndexFragment();
+        questionIndexFragment = new QuestionIndexFragment();
         questionIndexFragment.setArguments(b);
         fragmentTransaction.add(R.id.indexFrame, questionIndexFragment, "index");
         fragmentTransaction.commit();
@@ -114,6 +117,12 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
         b.putSerializable("params", data);
         i.putExtra("package", b);
         startActivity(i);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        questionIndexFragment.onListAll();
     }
 
     @Override

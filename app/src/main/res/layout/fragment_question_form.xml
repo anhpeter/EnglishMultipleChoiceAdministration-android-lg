@@ -6,15 +6,15 @@
     android:padding="10dp"
     tools:context="MainFragments.QuestionFormFragment">
 
-     <!-- QUESTION -->
+    <!-- QUESTION -->
     <TextView
         android:id="@+id/txtQuestion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
+        android:layout_marginTop="10dp"
         android:text="@string/fa_icon_question_circle"
         android:textColor="@color/orange"
-        android:layout_marginTop="50dp"
         android:textSize="20sp"></TextView>
 
     <EditText
@@ -22,107 +22,157 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/txtQuestion"
-        android:layout_toRightOf="@id/txtQuestion"
         android:layout_marginLeft="20dp"
-        android:hint="Question"></EditText>
+        android:layout_toRightOf="@id/txtQuestion"
+        android:hint="Question"
+        android:maxLines="2"></EditText>
+
+    <!-- OPTION -->
+    <TextView
+        android:id="@+id/txtQuestionType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/txtQuestion"
+        android:layout_marginTop="75dp"
+        android:text="Type."
+
+        android:textSize="16sp"></TextView>
+
+    <RadioGroup
+        android:id="@+id/radioGroupQuestionType"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtQuestion"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="70dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Text"></RadioButton>
+
+        <RadioButton
+            android:id="@+id/radioButtonPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="Picture"
+
+            ></RadioButton>
+    </RadioGroup>
+
+    <!--
+    <TextView
+        android:id="@+id/txtLevel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@id/txtQuestionType"
+        android:layout_marginTop="20dp"
+        android:text="Level."
+
+        android:textSize="16sp"></TextView>
+
+    <Spinner
+        android:id="@+id/spinnerLevel"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+
+        android:layout_alignBaseline="@id/txtLevel"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="20dp"
+
+        ></Spinner>
+
+    -->
+    <LinearLayout
+        android:id="@+id/linearRadioGroupCorrectAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/radioGroupQuestionType"
+        android:layout_alignBottom="@id/linearEditText"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/radioGroupCorrectAnswer"
+            android:layout_width="wrap_content"
+            android:weightSum="4"
+            android:layout_height="match_parent">
+
+            <RadioButton
+                android:id="@+id/radioA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioB"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioC"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioD"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"></RadioButton>
+        </RadioGroup>
+    </LinearLayout>
 
     <!-- ANSWER -->
-    <TextView
-        android:id="@+id/txtA"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_below="@id/edtQuestion"
-        android:layout_marginTop="50dp"
-        android:text="A."
-
-        android:textColor="@color/blue"
-        android:textSize="20sp"></TextView>
-
-    <EditText
-        android:id="@+id/edtAnswerA"
+    <LinearLayout
+        android:id="@+id/linearEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:layout_alignBaseline="@id/txtA"
         android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@id/txtA"
-        android:hint="Answer"></EditText>
+        android:layout_below="@+id/radioGroupQuestionType"
+        android:layout_toRightOf="@id/linearRadioGroupCorrectAnswer"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/txtB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
 
-        android:layout_below="@id/edtAnswerA"
-        android:layout_marginTop="20dp"
-        android:text="B."
+        <EditText
+            android:id="@+id/edtAnswerA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Option 1"></EditText>
 
-        android:textColor="@color/blue"
-        android:textSize="20sp"></TextView>
+        <EditText
+            android:id="@+id/edtAnswerB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Option 2"></EditText>
 
-    <EditText
-        android:id="@+id/edtAnswerB"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        <EditText
+            android:id="@+id/edtAnswerC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Option 3"></EditText>
 
-        android:layout_alignBaseline="@id/txtB"
-        android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@id/txtB"
-        android:hint="Answer"></EditText>
-
-    <TextView
-        android:id="@+id/txtC"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_below="@id/edtAnswerB"
-        android:layout_marginTop="20dp"
-        android:text="C."
-
-        android:textColor="@color/blue"
-        android:textSize="20sp"></TextView>
-
-    <EditText
-        android:id="@+id/edtAnswerC"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_alignBaseline="@id/txtC"
-        android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@id/txtC"
-
-        android:hint="Answer"></EditText>
-
-    <TextView
-        android:id="@+id/txtD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_below="@id/edtAnswerC"
-        android:layout_marginTop="20dp"
-        android:text="D."
-
-        android:textColor="@color/blue"
-        android:textSize="20sp"></TextView>
-
-    <EditText
-        android:id="@+id/edtAnswerD"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_alignBaseline="@id/txtD"
-        android:layout_marginLeft="20dp"
-        android:layout_toRightOf="@id/txtD"
-
-        android:hint="Answer"></EditText>
+        <EditText
+            android:id="@+id/edtAnswerD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Option 4"></EditText>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_below="@id/edtAnswerD"
+        android:layout_below="@id/linearEditText"
         android:layout_centerHorizontal="true"
 
         android:layout_marginTop="50dp"

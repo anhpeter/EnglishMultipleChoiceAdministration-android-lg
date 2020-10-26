@@ -61,7 +61,7 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         onAddClicked();
     }
 
-    private void onListAll() {
+    public void onListAll() {
         HashMap<String, String> params = new HashMap<>();
         params.put("level", questionLevel);
         questionModel.listAll(params, "list-all");
@@ -99,6 +99,7 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         String formType = (id == null) ? "add" : "edit";
         HashMap<String, String> params = new HashMap<>();
         params.put("id", id);
+        params.put("level", questionLevel);
         params.put("formType", formType);
         fragmentCommunicate.communicate(params, fragmentName);
     }
@@ -126,7 +127,6 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
     }
 
     private void onListAllCallback(ArrayList<Question> items) {
-        Log.d("xxx", "list callback called, items size: " + items.size());
         questionArrayList.clear();
         if (!items.isEmpty()) {
             txtMessage.setText("");

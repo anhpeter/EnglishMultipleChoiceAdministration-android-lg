@@ -166,7 +166,6 @@ public class IndexTitleBarFragment extends Fragment {
             HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
             controller = params.get("controller");
             questionLevel = params.get("questionLevel");
-            Log.d("xxx", "data received: " + controller + " - " + questionLevel);
         }
     }
 
