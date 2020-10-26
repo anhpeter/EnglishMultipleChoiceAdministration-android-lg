@@ -36,6 +36,7 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
     Button btnBack, btnDelete;
     View v;
     String id;
+    String formType;
     FragmentCommunicate fragmentCommunicate;
     QuestionModel questionModel;
 
@@ -56,7 +57,6 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
         fragmentCommunicate = (FragmentCommunicate) getActivity();
         // set arguments
         setArguments();
-
         onBackClicked();
         onDeleteClicked();
     }
@@ -107,6 +107,10 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
         if (bundle != null) {
             HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
             id = params.get("id");
+            formType = params.get("formType");
+            if (formType.equals("add")){
+                btnDelete.setVisibility(View.GONE);
+            }
         }
     }
 

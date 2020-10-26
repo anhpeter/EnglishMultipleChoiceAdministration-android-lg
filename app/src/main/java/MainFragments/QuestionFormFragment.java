@@ -1,7 +1,14 @@
 package MainFragments;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -11,14 +18,23 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+
 import com.example.multiple_choice.R;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,28 +51,39 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
     QuestionModel questionModel;
     View v;
 
+    // PARAMS
     String formType;
     Question item;
     HashMap<String, String> params;
 
+    // WIDGET
     Spinner spinnerLevel;
     RadioGroup radioGroupQuestionType, radioGroupCorrectAnswer;
     EditText edtQuestion, edtAnswerA, edtAnswerB, edtAnswerC, edtAnswerD;
+    RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
+    ImageView pictureA, pictureB, pictureC, pictureD;
+    RelativeLayout rltTextAnswer, rltPictureAnswer;
     Button btnSubmit;
+
+    // VALUE ARRAY
     String levelValues[] = {"hard", "medium", "easy"};
     String typeValues[] = {"text", "picture"};
     String correctAnswerValues[] = {"A", "B", "C", "D"};
+
+    // WIDGET ARRAYS
+    RadioButton radioPictures[];
+    ImageView pictures[];
+
+    // REQUEST CODE
+    int PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE = 111;
+    ImageView interactingPicture;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_question_form, container, false);
-        /*
-        edtQuestion.clearFocus();
-        Helper.hideKeyboard(getActivity());
         Helper.initFontAwesome(getActivity(), v);
-        */
 
         mapping();
         onInit();
@@ -67,20 +94,76 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         Helper.clearEditTextFocus(edtQuestion);
         questionModel = new QuestionModel(getActivity(), this);
         fragmentCommunicate = (FragmentCommunicate) getActivity();
+        radioPictures = new RadioButton[]{radioPictureA, radioPictureB, radioPictureC, radioPictureD};
+        pictures = new ImageView[]{pictureA, pictureB, pictureC, pictureD};
+        radioPictureA.setChecked(true);
         setArguments();
         //initLevelSpinner();
-        initRadioEvents();
+        onPictureRadiosChecked();
+        onPictureClicked();
+        onQuestionTypeRadiosChecked();
         onSubmitClick();
     }
 
-    private void initRadioEvents() {
+    private void onPictureClicked() {
+        for (int i = 0; i < pictures.length; i++) {
+            pictures[i].setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View v) {
+                    interactingPicture = ((ImageView)v);
+                    requestPermissions( new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.ACCESS_FINE_LOCATION},
+                            PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
+                    Toast.makeText(getActivity(), getAnswerLetterByImageViewId(v.getId()), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private String getAnswerLetterByImageViewId(int id) {
+        String result = "";
+        String letters[] = {"A", "B", "C", "D"};
+        for (int i = 0; i < pictures.length; i++) {
+            if (pictures[i].getId() == id) {
+                result = letters[i];
+                break;
+            }
+        }
+        return result;
+    }
+
+    private void onPictureRadiosChecked() {
+        for (int i = 0; i < radioPictures.length; i++) {
+            radioPictures[i].setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        for (int i = 0; i < radioPictures.length; i++) {
+                            RadioButton radioButton = radioPictures[i];
+                            if (buttonView.getId() != radioButton.getId()) {
+                                radioButton.setChecked(false);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private void onQuestionTypeRadiosChecked() {
         radioGroupQuestionType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
                     case R.id.radioButtonText:
+                        rltPictureAnswer.setVisibility(View.GONE);
+                        rltTextAnswer.setVisibility(View.VISIBLE);
                         break;
                     case R.id.radioButtonPicture:
+                        rltTextAnswer.setVisibility(View.GONE);
+                        rltPictureAnswer.setVisibility(View.VISIBLE);
                         break;
                 }
             }
@@ -115,18 +198,22 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
                 String question = edtQuestion.getText().toString().trim();
                 String questionType = getQuestionTypeValue();
                 String level = getQuestionLevelValue();
-                String answerA = edtAnswerA.getText().toString().trim();
-                String answerB = edtAnswerB.getText().toString().trim();
-                String answerC = edtAnswerC.getText().toString().trim();
-                String answerD = edtAnswerD.getText().toString().trim();
-                String correctAnswer = getCorrectAnswerValue();
-                if (isValid(question, questionType, level, correctAnswer, answerA, answerB, answerC, answerD)) {
-                    Question questionObj = new Question(id, question, correctAnswer,
-                            answerA, answerB, answerC, answerD, questionType, level, -1);
-                    if (formType.equals("edit")) solveEdit(questionObj);
-                    else if (formType.equals("add")) solveAdd(questionObj);
-                } else {
-                    Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
+                if (questionType == "text") {
+                    String answerA = edtAnswerA.getText().toString().trim();
+                    String answerB = edtAnswerB.getText().toString().trim();
+                    String answerC = edtAnswerC.getText().toString().trim();
+                    String answerD = edtAnswerD.getText().toString().trim();
+                    String correctAnswer = getCorrectAnswerValue();
+                    if (isValid(question, questionType, level, correctAnswer, answerA, answerB, answerC, answerD)) {
+                        Question questionObj = new Question(id, question, correctAnswer,
+                                answerA, answerB, answerC, answerD, questionType, level, -1);
+                        if (formType.equals("edit")) solveEdit(questionObj);
+                        else if (formType.equals("add")) solveAdd(questionObj);
+                    } else {
+                        Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (questionType == "picture") {
+                    Toast.makeText(getActivity(), "Picture answer", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -234,10 +321,10 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         setViewValueByItem();
     }
 
-    private void setViewValueByItem(){
+    private void setViewValueByItem() {
         //spinnerLevel.setSelection(getLevelPos(item.getLevel()));
-        ((RadioButton)radioGroupQuestionType.getChildAt(getTypePos(item.getQuestionType()))).setChecked(true);
-        ((RadioButton)radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
+        ((RadioButton) radioGroupQuestionType.getChildAt(getTypePos(item.getQuestionType()))).setChecked(true);
+        ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
 
     }
 
@@ -254,11 +341,11 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
     }
 
     private void onUpdateItemCallBack(Question item) {
-        Toast.makeText(getActivity(), "item "+item.getId()+" updated", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "item " + item.getId() + " updated", Toast.LENGTH_SHORT).show();
     }
 
     private void onAddItemCallBack(Question item) {
-        Toast.makeText(getActivity(), "item "+item.getId()+" added", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "item " + item.getId() + " added", Toast.LENGTH_SHORT).show();
     }
 
     private void mapping() {
@@ -271,5 +358,45 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         edtAnswerC = (EditText) v.findViewById(R.id.edtAnswerC);
         edtAnswerD = (EditText) v.findViewById(R.id.edtAnswerD);
         btnSubmit = (Button) v.findViewById(R.id.btnSubmit);
+
+        radioPictureA = (RadioButton) v.findViewById(R.id.radioPictureA);
+        radioPictureB = (RadioButton) v.findViewById(R.id.radioPictureB);
+        radioPictureC = (RadioButton) v.findViewById(R.id.radioPictureC);
+        radioPictureD = (RadioButton) v.findViewById(R.id.radioPictureD);
+
+        pictureA = (ImageView) v.findViewById(R.id.pictureA);
+        pictureB = (ImageView) v.findViewById(R.id.pictureB);
+        pictureC = (ImageView) v.findViewById(R.id.pictureC);
+        pictureD = (ImageView) v.findViewById(R.id.pictureD);
+
+        rltTextAnswer = (RelativeLayout) v.findViewById(R.id.rltTextAnswer);
+        rltPictureAnswer = (RelativeLayout) v.findViewById(R.id.rltPictureAnswer);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if ( requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE &&
+                grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+            Intent i = new Intent(Intent.ACTION_PICK);
+            i.setType("image/*");
+            startActivityForResult(i, PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE && resultCode == getActivity().RESULT_OK && data!=null){
+            Uri uri = data.getData();
+            try {
+                InputStream inputStream =  getActivity().getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                interactingPicture.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
