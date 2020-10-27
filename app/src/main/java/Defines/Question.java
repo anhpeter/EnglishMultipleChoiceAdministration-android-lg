@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import java.util.HashMap;
 public class Question {
 
     private String id;
-
 
     private String question;
     private String correctAnswer;
@@ -107,7 +107,11 @@ public class Question {
     }
 
     public void setCreated(long created) {
-        if (created < 0 ) this.created = System.currentTimeMillis();
+        if (created <= 0 ){
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            System.out.println(timestamp);
+            this.created = (this.created > 0) ? this.created : timestamp.getTime();
+        }
         else this.created = created;
     }
 
@@ -160,4 +164,7 @@ public class Question {
         return getId()+ ", "+getQuestion()+", "+getQuestionType()+", "+getLevel()+", "+getCorrectAnswer()+", "+getAnswerA()+", "+getAnswerB()+", "+getAnswerC()+", "+getAnswerD()+", "+getCreated();
     }
 
+    public boolean getIsImageQuestion(){
+        return false;
+    }
 }

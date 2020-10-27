@@ -13,10 +13,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.multiple_choice.R;
@@ -25,12 +21,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import Defines.FragmentCommunicate;
-import Defines.ICallback;
 import Defines.Question;
 import Helpers.Helper;
 import Models.QuestionModel;
 
-public class QuestionFormTitleBarFragment extends Fragment implements ICallback {
+public class QuestionFormTitleBarFragment extends Fragment{
 
     String fragmentName = "question-form-title-bar";
     Button btnBack, btnDelete;
@@ -38,7 +33,6 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
     String id;
     String formType;
     FragmentCommunicate fragmentCommunicate;
-    QuestionModel questionModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,7 +47,6 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
     }
 
     private void onInit(){
-        questionModel = new QuestionModel(getActivity(), this);
         fragmentCommunicate = (FragmentCommunicate) getActivity();
         // set arguments
         setArguments();
@@ -99,7 +92,9 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
     }
 
     private void onDelete(){
-        questionModel.deleteItemById(id, "delete-item");
+        HashMap<String, String> params = new HashMap<>();
+        params.put("delete", "yes");
+        fragmentCommunicate.communicate(params, fragmentName);
     }
 
     private void setArguments() {
@@ -119,19 +114,4 @@ public class QuestionFormTitleBarFragment extends Fragment implements ICallback 
         btnDelete = (Button) v.findViewById(R.id.btnDelete);
     }
 
-    @Override
-    public void itemCallBack(Object item, String tag) {
-        if (tag.equals("delete-item")) onDeleteItemCallback();
-    }
-
-    private void onDeleteItemCallback(){
-        Toast.makeText(getActivity(), "item "+id+" deleted", Toast.LENGTH_SHORT).show();
-        getActivity().onBackPressed();
-    }
-
-
-    @Override
-    public void listCallBack(ArrayList items, String tag) {
-
-    }
 }

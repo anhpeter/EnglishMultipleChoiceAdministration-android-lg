@@ -231,6 +231,8 @@
                     android:src="@drawable/add_picture">
                 </ImageView>
             </LinearLayout>
+
+            <!-- LINE 2 -->
             <LinearLayout
                 android:id="@+id/linearPictureAnswerLine2"
                 android:layout_width="match_parent"
@@ -272,6 +274,35 @@
                     android:src="@drawable/add_picture">
                 </ImageView>
             </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/rltProgressUpload"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_below="@id/linearPictureAnswerLine2"
+                android:visibility="gone"
+                >
+                <ProgressBar
+                    android:id="@+id/progressUpload"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:progressTint="#008EFF"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/txtUploadProgress"
+                    ></ProgressBar>
+                <TextView
+                    android:id="@+id/txtUploadProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+
+                    android:text="0%"
+                    android:textColor="#008EFF"
+                    android:textSize="16sp"
+                    android:layout_alignParentRight="true"
+                    ></TextView>
+            </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -284,7 +315,7 @@
         android:layout_below="@id/rltAnswerWrapper"
         android:layout_centerHorizontal="true"
 
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="40dp"
         android:text="Submit"
         android:textAllCaps="false"></Button>
 

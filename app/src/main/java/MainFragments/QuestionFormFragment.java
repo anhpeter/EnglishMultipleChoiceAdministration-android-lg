@@ -2,7 +2,6 @@ package MainFragments;
 
 import android.Manifest;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,17 +21,19 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 
 import com.example.multiple_choice.R;
+import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -40,11 +42,14 @@ import java.util.HashMap;
 
 import Defines.FragmentCommunicate;
 import Defines.ICallback;
+import Defines.IMyStorage;
 import Defines.Question;
 import Helpers.Helper;
+import Helpers.MyStorage;
+import Helpers.QuestionPictureManager;
 import Models.QuestionModel;
 
-public class QuestionFormFragment extends Fragment implements ICallback<Question> {
+public class QuestionFormFragment extends Fragment implements ICallback<Question>, IMyStorage {
 
     String fragmentName = "question-form";
     FragmentCommunicate fragmentCommunicate;
@@ -60,15 +65,18 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
     Spinner spinnerLevel;
     RadioGroup radioGroupQuestionType, radioGroupCorrectAnswer;
     EditText edtQuestion, edtAnswerA, edtAnswerB, edtAnswerC, edtAnswerD;
+    TextView txtUploadProgress;
     RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
     ImageView pictureA, pictureB, pictureC, pictureD;
-    RelativeLayout rltTextAnswer, rltPictureAnswer;
+    RelativeLayout rltTextAnswer, rltPictureAnswer, rltUploadProgress;
     Button btnSubmit;
+    ProgressBar progressUpload;
 
     // VALUE ARRAY
     String levelValues[] = {"hard", "medium", "easy"};
     String typeValues[] = {"text", "picture"};
     String correctAnswerValues[] = {"A", "B", "C", "D"};
+    String picturePaths[] = {"", "", "", ""};
 
     // WIDGET ARRAYS
     RadioButton radioPictures[];
@@ -76,7 +84,13 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
 
     // REQUEST CODE
     int PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE = 111;
+
+    // OTHER
+    int totalUpload;
+    double progressArr[];
+    int progress;
     ImageView interactingPicture;
+    QuestionPictureManager questionPictureManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,6 +105,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
     }
 
     private void onInit() {
+        setDefaultPictureQuestionParams();
         Helper.clearEditTextFocus(edtQuestion);
         questionModel = new QuestionModel(getActivity(), this);
         fragmentCommunicate = (FragmentCommunicate) getActivity();
@@ -111,27 +126,25 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
                 @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
-                    interactingPicture = ((ImageView)v);
-                    requestPermissions( new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    interactingPicture = ((ImageView) v);
+                    requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE,
                                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                     Manifest.permission.ACCESS_FINE_LOCATION},
                             PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
-                    Toast.makeText(getActivity(), getAnswerLetterByImageViewId(v.getId()), Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
-    private String getAnswerLetterByImageViewId(int id) {
-        String result = "";
-        String letters[] = {"A", "B", "C", "D"};
+    private int getAnswerPosByImageViewId(int id) {
+        int no = 0;
         for (int i = 0; i < pictures.length; i++) {
             if (pictures[i].getId() == id) {
-                result = letters[i];
+                no = i;
                 break;
             }
         }
-        return result;
+        return no;
     }
 
     private void onPictureRadiosChecked() {
@@ -180,7 +193,6 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         spinnerLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //fragmentCommunicate.communicate(getHashMapDataBySpinnerItemPosition(position), fragmentName);
             }
 
             @Override
@@ -189,36 +201,60 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         });
     }
 
+    // ON SUBMIT
     private void onSubmitClick() {
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String result = "";
-                String id = (formType.equals("edit")) ? item.getId() : null;
-                String question = edtQuestion.getText().toString().trim();
                 String questionType = getQuestionTypeValue();
-                String level = getQuestionLevelValue();
                 if (questionType == "text") {
-                    String answerA = edtAnswerA.getText().toString().trim();
-                    String answerB = edtAnswerB.getText().toString().trim();
-                    String answerC = edtAnswerC.getText().toString().trim();
-                    String answerD = edtAnswerD.getText().toString().trim();
-                    String correctAnswer = getCorrectAnswerValue();
-                    if (isValid(question, questionType, level, correctAnswer, answerA, answerB, answerC, answerD)) {
-                        Question questionObj = new Question(id, question, correctAnswer,
-                                answerA, answerB, answerC, answerD, questionType, level, -1);
-                        if (formType.equals("edit")) solveEdit(questionObj);
-                        else if (formType.equals("add")) solveAdd(questionObj);
-                    } else {
-                        Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
-                    }
+                    onSaveTextQuestion();
                 } else if (questionType == "picture") {
-                    Toast.makeText(getActivity(), "Picture answer", Toast.LENGTH_SHORT).show();
+                    onSavePictureQuestion();
                 }
             }
         });
     }
 
+    // ON SAVE
+    private void onSaveTextQuestion() {
+        HashMap<String, String> saveParams = getSaveParams();
+        String answerA = edtAnswerA.getText().toString().trim();
+        String answerB = edtAnswerB.getText().toString().trim();
+        String answerC = edtAnswerC.getText().toString().trim();
+        String answerD = edtAnswerD.getText().toString().trim();
+        if (isTextQuestionOptionValid(answerA, answerB, answerC, answerD)) {
+            questionPictureManager.deleteAllIfExist();
+            Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswer"),
+                    answerA, answerB, answerC, answerD, saveParams.get("questionType"), saveParams.get("level"), -1);
+            if (formType.equals("edit")) solveEdit(questionObj);
+            else if (formType.equals("add")) solveAdd(questionObj);
+        } else {
+            showInValidMessage();
+        }
+    }
+
+    private void onSavePictureQuestion() {
+        if (isPictureQuestionOptionValid() && questionPictureManager.isAnswerUriValid()) {
+            totalUpload = questionPictureManager.getTotalUpload();
+            if (totalUpload > 0) {
+                rltUploadProgress.setVisibility(View.VISIBLE);
+                questionPictureManager.upload(QuestionFormFragment.this);
+            } else {
+                savePictureQuestion();
+            }
+        } else {
+            showInValidMessage();
+        }
+    }
+
+    // ON DELETE
+    public void onDelete() {
+        questionPictureManager.deleteAllIfExist();
+        questionModel.deleteItemById(item.getId(), "delete-item");
+    }
+
+    //
     private void solveEdit(Question question) {
         questionModel.updateItem(question, "update-item");
     }
@@ -227,16 +263,24 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         questionModel.addItem(question, "add-item");
     }
 
-    private boolean isValid(String question, String questionType, String level, String correctAnswer, String answerA, String answerB, String answerC, String answerD) {
+    private boolean isTextQuestionOptionValid(String answerA, String answerB, String answerC, String answerD) {
         if (
-                !question.trim().isEmpty() &&
-                        !questionType.trim().isEmpty() &&
-                        !level.trim().isEmpty() &&
-                        !correctAnswer.trim().isEmpty() &&
+                isPictureQuestionOptionValid() &&
                         !answerA.trim().isEmpty() &&
                         !answerB.trim().isEmpty() &&
                         !answerC.trim().isEmpty() &&
                         !answerD.trim().isEmpty()
+        ) return true;
+        return false;
+    }
+
+    private boolean isPictureQuestionOptionValid() {
+        HashMap<String, String> saveParams = getSaveParams();
+        if (
+                !saveParams.get("question").isEmpty() &&
+                        !saveParams.get("questionType").isEmpty() &&
+                        !saveParams.get("level").isEmpty() &&
+                        !saveParams.get("correctAnswer").trim().isEmpty()
         ) return true;
         return false;
     }
@@ -253,21 +297,27 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
 
     private String getCorrectAnswerValue() {
         String result = "";
-        int typeRadioButtonId = radioGroupCorrectAnswer.getCheckedRadioButtonId();
-        switch (typeRadioButtonId) {
-            case R.id.radioA:
-                result = "A";
-                break;
-            case R.id.radioB:
-                result = "B";
-                break;
-            case R.id.radioC:
-                result = "C";
-                break;
-
-            case R.id.radioD:
-                result = "D";
-                break;
+        if (getQuestionTypeValue().equals("text")) {
+            int typeRadioButtonId = radioGroupCorrectAnswer.getCheckedRadioButtonId();
+            switch (typeRadioButtonId) {
+                case R.id.radioA:
+                    result = "A";
+                    break;
+                case R.id.radioB:
+                    result = "B";
+                    break;
+                case R.id.radioC:
+                    result = "C";
+                    break;
+                case R.id.radioD:
+                    result = "D";
+                    break;
+            }
+        } else {
+            if (radioPictureA.isChecked()) result = "A";
+            else if (radioPictureB.isChecked()) result = "B";
+            else if (radioPictureC.isChecked()) result = "C";
+            else if (radioPictureD.isChecked()) result = "D";
         }
         return result;
     }
@@ -293,39 +343,13 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         String id = params.get("id");
         String defaultLevel = params.get("level");
         formType = params.get("formType");
-        if (formType.equals("edit") && id != null) getItemById(id);
+        if (formType.equals("edit") && id != null) {
+            getItemById(id);
+        } else initQuestionPictureManager();
     }
 
     private void getItemById(String id) {
         questionModel.getItemById(id, "get-edit-item");
-    }
-
-    @Override
-    public void itemCallBack(Question item, String tag) {
-        if (tag.equals("get-edit-item")) onGetEditItemCallBack(item);
-        if (tag.equals("update-item")) onUpdateItemCallBack(item);
-        if (tag.equals("add-item")) onAddItemCallBack(item);
-    }
-
-    @Override
-    public void listCallBack(ArrayList<Question> items, String tag) {
-    }
-
-    private void onGetEditItemCallBack(Question item) {
-        this.item = item;
-        edtQuestion.setText(item.getQuestion());
-        edtAnswerA.setText(item.getAnswerA());
-        edtAnswerB.setText(item.getAnswerB());
-        edtAnswerC.setText(item.getAnswerC());
-        edtAnswerD.setText(item.getAnswerD());
-        setViewValueByItem();
-    }
-
-    private void setViewValueByItem() {
-        //spinnerLevel.setSelection(getLevelPos(item.getLevel()));
-        ((RadioButton) radioGroupQuestionType.getChildAt(getTypePos(item.getQuestionType()))).setChecked(true);
-        ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
-
     }
 
     private int getLevelPos(String level) {
@@ -340,14 +364,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         return java.util.Arrays.asList(correctAnswerValues).indexOf(answer);
     }
 
-    private void onUpdateItemCallBack(Question item) {
-        Toast.makeText(getActivity(), "item " + item.getId() + " updated", Toast.LENGTH_SHORT).show();
-    }
-
-    private void onAddItemCallBack(Question item) {
-        Toast.makeText(getActivity(), "item " + item.getId() + " added", Toast.LENGTH_SHORT).show();
-    }
-
+    // MAPPING
     private void mapping() {
         //spinnerLevel = (Spinner) v.findViewById(R.id.spinnerLevel);
         radioGroupQuestionType = (RadioGroup) v.findViewById(R.id.radioGroupQuestionType);
@@ -358,6 +375,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         edtAnswerC = (EditText) v.findViewById(R.id.edtAnswerC);
         edtAnswerD = (EditText) v.findViewById(R.id.edtAnswerD);
         btnSubmit = (Button) v.findViewById(R.id.btnSubmit);
+        txtUploadProgress = (TextView) v.findViewById(R.id.txtUploadProgress);
 
         radioPictureA = (RadioButton) v.findViewById(R.id.radioPictureA);
         radioPictureB = (RadioButton) v.findViewById(R.id.radioPictureB);
@@ -371,13 +389,16 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
 
         rltTextAnswer = (RelativeLayout) v.findViewById(R.id.rltTextAnswer);
         rltPictureAnswer = (RelativeLayout) v.findViewById(R.id.rltPictureAnswer);
+        rltUploadProgress = (RelativeLayout) v.findViewById(R.id.rltProgressUpload);
+        progressUpload = (ProgressBar) v.findViewById(R.id.progressUpload);
     }
 
+    // PERMISSION
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if ( requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE &&
+        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE &&
                 grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Intent i = new Intent(Intent.ACTION_PICK);
             i.setType("image/*");
             startActivityForResult(i, PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
@@ -387,10 +408,11 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE && resultCode == getActivity().RESULT_OK && data!=null){
-            Uri uri = data.getData();
+        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE && resultCode == getActivity().RESULT_OK && data != null) {
+            Uri filePath = data.getData();
+            questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
             try {
-                InputStream inputStream =  getActivity().getContentResolver().openInputStream(uri);
+                InputStream inputStream = getActivity().getContentResolver().openInputStream(filePath);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 interactingPicture.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
@@ -399,4 +421,166 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+    // STORAGE CALLBACK
+    @Override
+    public void uploadedCallback(String url, int code) {
+        Log.d("xxx", url);
+        questionPictureManager.setPathByIndex(code, url);
+    }
+
+    @Override
+    public void progressCallback(double value, int code) {
+        progressArr[code] = value;
+        double totalProgress = 0;
+        for (int i = 0; i < 4; i++) totalProgress += progressArr[i];
+        progress = (int) (((totalProgress / 100) / totalUpload) * 100);
+        progressUpload.setProgress(progress);
+        txtUploadProgress.setText(progress + "%");
+        if (progress == 100) {
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            savePictureQuestion();
+                        }
+                    }, 500);
+        }
+    }
+
+    public void savePictureQuestion() {
+        Log.d("xxx", "on save");
+        HashMap<String, String> saveParams = getSaveParams();
+        Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswer"),
+                questionPictureManager.getAnswerAPath(),
+                questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
+                saveParams.get("questionType"), saveParams.get("level"), -1);
+        if (formType.equals("edit")) solveEdit(questionObj);
+        else if (formType.equals("add")) solveAdd(questionObj);
+    }
+
+    @Override
+    public void deletedCallback(int code) {
+
+    }
+
+    // DATABASE CALLBACK
+    @Override
+    public void itemCallBack(Question item, String tag) {
+        if (tag.equals("get-edit-item")) onGetEditItemCallBack(item);
+        if (tag.equals("update-item")) onUpdateItemCallBack(item);
+        if (tag.equals("add-item")) onAddItemCallBack(item);
+        if (tag.equals("delete-item")) onDeleteItemCallback();
+    }
+
+    private void onGetEditItemCallBack(Question item) {
+        this.item = item;
+        edtQuestion.setText(item.getQuestion());
+        ((RadioButton) radioGroupQuestionType.getChildAt(getTypePos(item.getQuestionType()))).setChecked(true);
+        if (item.getQuestionType().equals("text")) {
+            setTextQuestionView();
+        } else {
+            setPictureQuestionView();
+        }
+        initQuestionPictureManager();
+    }
+
+    private void setTextQuestionView() {
+        rltTextAnswer.setVisibility(View.VISIBLE);
+        rltPictureAnswer.setVisibility(View.GONE);
+        edtQuestion.setText(item.getQuestion());
+        edtAnswerA.setText(item.getAnswerA());
+        edtAnswerB.setText(item.getAnswerB());
+        edtAnswerC.setText(item.getAnswerC());
+        edtAnswerD.setText(item.getAnswerD());
+        ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
+    }
+
+    private void setPictureQuestionView() {
+        rltPictureAnswer.setVisibility(View.VISIBLE);
+        rltTextAnswer.setVisibility(View.GONE);
+        Picasso.get().load(item.getAnswerA()).into(pictureA);
+        Picasso.get().load(item.getAnswerB()).into(pictureB);
+        Picasso.get().load(item.getAnswerC()).into(pictureC);
+        Picasso.get().load(item.getAnswerD()).into(pictureD);
+        ((RadioButton) radioPictures[getCorrectAnswerPos(item.getCorrectAnswer())]).setChecked(true);
+    }
+
+    private void onUpdateItemCallBack(Question item) {
+        this.item = item;
+        initQuestionPictureManager();
+        resetLayoutAndParams(item.getQuestionType());
+        Toast.makeText(getActivity(), "Item  updated", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onAddItemCallBack(Question item) {
+        Toast.makeText(getActivity(), "Item  added", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onDeleteItemCallback() {
+        Toast.makeText(getActivity(), "Item  deleted", Toast.LENGTH_SHORT).show();
+        getActivity().onBackPressed();
+    }
+
+
+    @Override
+    public void listCallBack(ArrayList<Question> items, String tag) {
+    }
+
+    // SUPPORT
+    private void initQuestionPictureManager() {
+        if (formType.equals("edit")) {
+            String questionPath = (item.getIsImageQuestion()) ? item.getQuestion() : null;
+            if (item.getQuestionType().equals("picture")) {
+                questionPictureManager = new QuestionPictureManager(questionPath, item.getAnswerA(), item.getAnswerB(), item.getAnswerC(), item.getAnswerD());
+            } else {
+                questionPictureManager = new QuestionPictureManager(questionPath, null, null, null, null);
+            }
+        } else {
+            questionPictureManager = new QuestionPictureManager(null, null, null, null, null);
+        }
+    }
+
+    private HashMap<String, String> getSaveParams() {
+        HashMap<String, String> saveParams = new HashMap<>();
+        String id = (formType.equals("edit")) ? item.getId() : null;
+        String question = edtQuestion.getText().toString().trim();
+        String level = getQuestionLevelValue();
+        String questionType = getQuestionTypeValue();
+        String correctAnswer = getCorrectAnswerValue();
+
+        saveParams.put("id", id);
+        saveParams.put("question", question);
+        saveParams.put("level", level);
+        saveParams.put("questionType", questionType);
+        saveParams.put("correctAnswer", correctAnswer);
+        return saveParams;
+    }
+
+    public void resetLayoutAndParams(String type) {
+        // if current type is text => clear picture answer, if current type is picture => clear text answer
+        if (type.equals("text")) {
+            pictureA.setImageResource(R.drawable.add_picture);
+            pictureB.setImageResource(R.drawable.add_picture);
+            pictureC.setImageResource(R.drawable.add_picture);
+            pictureD.setImageResource(R.drawable.add_picture);
+            rltUploadProgress.setVisibility(View.GONE);
+            setDefaultPictureQuestionParams();
+        } else {
+            edtAnswerA.setText("");
+            edtAnswerB.setText("");
+            edtAnswerC.setText("");
+            edtAnswerD.setText("");
+        }
+    }
+
+    public void showInValidMessage() {
+        Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
+    }
+
+    public void setDefaultPictureQuestionParams() {
+        totalUpload = 0;
+        progressArr = new double[]{0, 0, 0, 0};
+        progress = 0;
+    }
+
 }

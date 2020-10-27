@@ -25,6 +25,7 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
     FragmentManager fragmentManager;
     String controller;
     HashMap<String, String> myParams;
+    QuestionFormFragment questionFormFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,7 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
         fragmentTransaction.add(R.id.formTitleBarFrame, questionFormTitleBarFragment, "titleBar");
 
         // form
-        QuestionFormFragment questionFormFragment = new QuestionFormFragment();
+        questionFormFragment = new QuestionFormFragment();
         questionFormFragment.setArguments(b);
         fragmentTransaction.add(R.id.formFrame, questionFormFragment, "form");
         fragmentTransaction.commit();
@@ -78,7 +79,10 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
 
     @Override
     public void communicate(HashMap<String, String> data, String fromFragment) {
-
+        if (fromFragment.equals("question-form-title-bar")){
+            String delete = (data.get("delete") != null) ? data.get("delete") : "";
+            if (delete.equals("yes")) questionFormFragment.onDelete();
+        }
     }
 
     @Override
