@@ -44,7 +44,7 @@ public class QuestionAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        TextView txtQuestion, txtQuestionType, txtNo;
+        TextView txtQuestion, txtQuestionType, txtThumb;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class QuestionAdapter extends BaseAdapter {
 
             holder.txtQuestion  = (TextView) convertView.findViewById(R.id.txtQuestion);
             holder.txtQuestionType  = (TextView) convertView.findViewById(R.id.txtQuestionType);
-            holder.txtNo  = (TextView) convertView.findViewById(R.id.txtNo);
+            holder.txtThumb  = (TextView) convertView.findViewById(R.id.txtThumb);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
@@ -65,10 +65,17 @@ public class QuestionAdapter extends BaseAdapter {
 
         Question question = questionArrayList.get(position);
         holder.txtQuestion.setText(question.getQuestion());
-        holder.txtQuestionType.setText("Question type: "+question.getQuestionType());
-        holder.txtNo.setText(position+1+"");
+        holder.txtQuestionType.setText("Type: "+question.getQuestionType());
+        String thumbText = (question.getIsImageQuestion()) ? "P" : getUppercaseFirstCharacter(question.getQuestion());
+        holder.txtThumb.setText(thumbText);
         Animation animScale = AnimationUtils.loadAnimation(context, R.anim.anim_scale_for_listview_item);
         convertView.startAnimation(animScale);
         return convertView;
+    }
+
+    private String getUppercaseFirstCharacter(String string){
+        string = (string!=null) ? string : "";
+        if (string.trim()!="") return (string.charAt(0)+"").toUpperCase();
+        return string;
     }
 }

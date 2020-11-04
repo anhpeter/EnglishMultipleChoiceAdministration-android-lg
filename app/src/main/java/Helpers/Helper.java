@@ -2,6 +2,7 @@ package Helpers;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -32,4 +33,5 @@ public class Helper {
         edt.setFocusableInTouchMode(true);
         edt.setFocusable(true);
     }
+
 }

@@ -564,13 +564,13 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
             pictureC.setImageResource(R.drawable.add_picture);
             pictureD.setImageResource(R.drawable.add_picture);
             rltUploadProgress.setVisibility(View.GONE);
-            setDefaultPictureQuestionParams();
         } else {
             edtAnswerA.setText("");
             edtAnswerB.setText("");
             edtAnswerC.setText("");
             edtAnswerD.setText("");
         }
+        setDefaultPictureQuestionParams();
     }
 
     public void showInValidMessage() {

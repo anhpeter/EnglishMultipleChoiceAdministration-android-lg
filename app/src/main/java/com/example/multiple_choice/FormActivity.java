@@ -48,7 +48,6 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
 
     private void solveInputError(){
         finish();
-        Toast.makeText(this, "Something went wrong!", Toast.LENGTH_SHORT).show();
     }
 
     private void callFragments() {
@@ -74,7 +73,6 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
     }
 
     private void callUserFragments() {
-        Toast.makeText(this, "User Fragments Called", Toast.LENGTH_SHORT).show();
     }
 
     @Override

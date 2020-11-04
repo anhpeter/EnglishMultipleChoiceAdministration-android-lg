@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Switch;
@@ -21,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import Defines.Auth;
 import Defines.FragmentCommunicate;
 import Defines.User;
 import Helpers.Helper;
@@ -31,25 +34,46 @@ import MainFragments.QuestionIndexFragment;
 public class MainActivity extends AppCompatActivity implements FragmentCommunicate {
 
     FragmentManager fragmentManager;
-
     String controller;
     String questionLevel;
     IndexTitleBarFragment indexTitleBarFragment;
     QuestionIndexFragment questionIndexFragment;
+    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        checkAuth();
         onInit();
-
         callFragments();
+    }
+
+    private void checkAuth() {
+        Auth auth = Auth.getInstance();
+        if (auth.getUser()== null) {
+            SharedPreferences sharedPreferences = getSharedPreferences("global-package", Context.MODE_PRIVATE);
+            if (sharedPreferences != null) {
+                String loggedUsername = sharedPreferences.getString("loggedUsername", "");
+                if (!loggedUsername.equals("")) {
+                    // logged
+                    auth.setUserByUsername(loggedUsername);
+                } else {
+                    // not logged
+                    navigateToLogin();
+                }
+            } else navigateToLogin();
+        }
+    }
+
+    private void navigateToLogin() {
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
     }
 
     private void onInit() {
         controller = "questions";
-        questionLevel = "eas1y";
+        questionLevel = "easy";
         fragmentManager = getFragmentManager();
         Helper.initFontAwesome(getApplicationContext(), getWindow().getDecorView());
     }
@@ -102,11 +126,10 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
             QuestionIndexFragment indexFragment = (QuestionIndexFragment) fragmentManager.findFragmentByTag("index");
 
             // if new question level # current => on change
-            if (!questionLevel.equals(newQuestionLevel)){
+            if (!questionLevel.equals(newQuestionLevel)) {
                 indexFragment.onChangeData(data);
                 questionLevel = newQuestionLevel;
             }
-            Toast.makeText(this, controller + " - " + questionLevel, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -127,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
 
     @Override
     public void onBackPressed() {
-        if (fragmentManager.getBackStackEntryCount() > 0){
+        if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
-        }else super.onBackPressed();
+        } else super.onBackPressed();
     }
 }

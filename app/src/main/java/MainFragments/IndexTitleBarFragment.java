@@ -3,6 +3,8 @@ package MainFragments;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -21,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.multiple_choice.LoginActivity;
 import com.example.multiple_choice.R;
 
 import java.util.ArrayList;
@@ -127,7 +130,7 @@ public class IndexTitleBarFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.menuLogout:
-                                Toast.makeText(getActivity(), "Logout", Toast.LENGTH_SHORT).show();
+                                onLogout();
                                 break;
                         }
                         return false;
@@ -136,6 +139,15 @@ public class IndexTitleBarFragment extends Fragment {
                 popupMenu.show();
             }
         });
+    }
+
+    private void onLogout(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("global-package", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("loggedUsername");
+        editor.apply();
+        Intent i = new Intent(getActivity(), LoginActivity.class);
+        startActivity(i);
     }
 
     private int getSpinnerItemPosition() {

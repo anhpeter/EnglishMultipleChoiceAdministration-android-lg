@@ -117,6 +117,15 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         }
     }
 
+    private void setArguments() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
+            questionLevel = params.get("questionLevel");
+        }
+    }
+
+    // DATABASE CALLBACK
     @Override
     public void itemCallBack(Question item, String tag) {
     }
@@ -140,13 +149,4 @@ public class QuestionIndexFragment extends Fragment implements ICallback<Questio
         }
         questionAdapter.notifyDataSetChanged();
     }
-
-    private void setArguments() {
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            HashMap<String, String> params = (HashMap<String, String>) bundle.getSerializable("params");
-            questionLevel = params.get("questionLevel");
-        }
-    }
-
 }

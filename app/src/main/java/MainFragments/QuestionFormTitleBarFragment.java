@@ -58,7 +58,6 @@ public class QuestionFormTitleBarFragment extends Fragment{
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Back clicked", Toast.LENGTH_SHORT).show();
                 getActivity().onBackPressed();
             }
         });

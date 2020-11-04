@@ -67,7 +67,6 @@ public class MyStorage {
     }
 
     public void delete(final String downloadUrl){
-        Log.d("xxx","delete url: "+ downloadUrl);
         StorageReference reference = storage.getReferenceFromUrl(downloadUrl);
         reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

@@ -13,7 +13,6 @@ import java.util.HashMap;
 public class Question {
 
     private String id;
-
     private String question;
     private String correctAnswer;
     private String answerA;
@@ -133,7 +132,8 @@ public class Question {
             String answerB = queryDocumentSnapshot.getString("answerB");
             String answerC = queryDocumentSnapshot.getString("answerC");
             String answerD = queryDocumentSnapshot.getString("answerD");
-            String questionType = queryDocumentSnapshot.getString("questionType");
+            boolean isImageAnswer = queryDocumentSnapshot.getBoolean("isImageAnswer");
+            String questionType = (isImageAnswer) ? "picture" : "text";
             String level = queryDocumentSnapshot.getString("level");
             long created;
             try{
@@ -154,10 +154,14 @@ public class Question {
         docData.put("answerC", getAnswerC());
         docData.put("answerD", getAnswerD());
         docData.put("correctAnswer", getCorrectAnswer());
-        docData.put("questionType", getQuestionType());
+        docData.put("isImageAnswer", getIsImageAnswer());
         docData.put("level", getLevel());
         docData.put("created", getCreated()+"");
         return docData;
+    }
+
+    public boolean getIsImageAnswer(){
+        return (getQuestionType().equals("text")) ? false : true;
     }
 
     public String getInfo(){
