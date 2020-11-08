@@ -7,32 +7,30 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.multiple_choice.R;
-
-import org.w3c.dom.Text;
+import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
 import Helpers.Helper;
 
-public class QuestionAdapter extends BaseAdapter {
+public class UserAdapter extends BaseAdapter {
     private Context context;
     private int layout;
-    private ArrayList<Question> questionArrayList;
+    private ArrayList<MyUser> userArrayList;
 
-    public QuestionAdapter(Context context, int layout, ArrayList<Question> questionArrayList) {
+    public UserAdapter(Context context, int layout, ArrayList<MyUser> userArrayList) {
         this.context = context;
         this.layout = layout;
-        this.questionArrayList = questionArrayList;
+        this.userArrayList = userArrayList;
     }
 
 
     @Override
     public int getCount() {
-        return questionArrayList.size();
+        return userArrayList.size();
     }
 
     @Override
@@ -46,34 +44,42 @@ public class QuestionAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        TextView txtQuestion, txtQuestionType, txtThumb;
+        TextView txtUsername, txtEmail, txtEmailLabel, txtThumb;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        QuestionAdapter.ViewHolder holder;
+        UserAdapter.ViewHolder holder;
         if (convertView == null){
-            holder = new QuestionAdapter.ViewHolder();
+            holder = new UserAdapter.ViewHolder();
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(layout, null);
+            Helper.initFontAwesome(context, convertView);
 
-            holder.txtQuestion  = (TextView) convertView.findViewById(R.id.txtQuestion);
-            holder.txtQuestionType  = (TextView) convertView.findViewById(R.id.txtQuestionType);
+            holder.txtUsername  = (TextView) convertView.findViewById(R.id.txtUsername);
+            holder.txtEmail  = (TextView) convertView.findViewById(R.id.txtEmail);
+            holder.txtEmailLabel  = (TextView) convertView.findViewById(R.id.txtEmailLabel);
             holder.txtThumb  = (TextView) convertView.findViewById(R.id.txtThumb);
             convertView.setTag(holder);
         }else{
-            holder = (QuestionAdapter.ViewHolder) convertView.getTag();
+            holder = (UserAdapter.ViewHolder) convertView.getTag();
         }
 
-        Question question = questionArrayList.get(position);
-        holder.txtQuestion.setText(question.getQuestion());
-        holder.txtQuestionType.setText("Type: "+question.getQuestionType());
-        String thumbText = (question.getIsImageQuestion()) ? "P" : Helper.getUppercaseFirstCharacter(question.getQuestion());
+        MyUser user = userArrayList.get(position);
+        holder.txtUsername.setText(user.getUsername());
+
+        // email
+        if (user.getEmail() == null){
+            holder.txtEmail.setVisibility(View.GONE);
+        }else{
+            holder.txtEmail.setVisibility(View.VISIBLE);
+            holder.txtEmail.setText(user.getEmail());
+        }
+        //
+        String thumbText = Helper.getUppercaseFirstCharacter(user.getUsername());
         holder.txtThumb.setText(thumbText);
         Animation animScale = AnimationUtils.loadAnimation(context, R.anim.anim_scale_for_listview_item);
         convertView.startAnimation(animScale);
         return convertView;
     }
-
-
 }

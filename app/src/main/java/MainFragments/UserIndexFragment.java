@@ -7,15 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.multiple_choice.Activity;
-import com.example.multiple_choice.MainActivity;
 import com.example.multiple_choice.R;
 
 import java.util.ArrayList;
@@ -23,28 +18,31 @@ import java.util.HashMap;
 
 import Defines.FragmentCommunicate;
 import Defines.ICallback;
+import Defines.MyUser;
 import Defines.Question;
 import Defines.QuestionAdapter;
+import Defines.UserAdapter;
 import Helpers.Helper;
 import Models.QuestionModel;
+import Models.UserModel;
 
-public class QuestionIndexFragment extends MyFragment implements ICallback<Question> {
+public class UserIndexFragment extends MyFragment implements ICallback<MyUser> {
 
     FragmentCommunicate fragmentCommunicate;
-    String fragmentName = "question-index";
-    QuestionModel questionModel;
+    String fragmentName = "user-index";
+    UserModel userModel;
     View v;
 
     TextView txtMessage;
     Button btnAdd;
     ListView lvMain;
-    ArrayList<Question> questionArrayList;
-    QuestionAdapter questionAdapter;
+    ArrayList<MyUser> userArrayList;
+    UserAdapter userAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_question_index, container, false);
+        v = inflater.inflate(R.layout.fragment_user_index, container, false);
         Helper.initFontAwesome(getActivity(), v);
 
         mapping();
@@ -54,36 +52,22 @@ public class QuestionIndexFragment extends MyFragment implements ICallback<Quest
 
     private void onInit() {
         fragmentCommunicate = (FragmentCommunicate) getActivity();
-        questionModel = new QuestionModel(getActivity(), this);
-        questionArrayList = new ArrayList<>();
+        userModel = new UserModel(getActivity(), this);
+        userArrayList = new ArrayList<>();
         onListAll();
         initListView();
         onAddClicked();
     }
 
+    private void initListView() {
+        userAdapter = new UserAdapter(getActivity(), R.layout.user_item_layout, userArrayList);
+        lvMain.setAdapter(userAdapter);
+        //setListViewEvents();
+    }
+
     public void onListAll() {
         HashMap<String, String> params = new HashMap<>();
-        params.put("level", getCalledActivity().getQuestionLevel());
-        questionModel.listAll(params, "list-all");
-    }
-
-    private void initListView() {
-        questionAdapter = new QuestionAdapter(getActivity(), R.layout.question_item_layout, questionArrayList);
-        lvMain.setAdapter(questionAdapter);
-        setListViewEvents();
-    }
-
-    private void setListViewEvents() {
-        onListViewItemClick();
-    }
-
-    private void onListViewItemClick() {
-        lvMain.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                requestForm(questionArrayList.get(position).getId());
-            }
-        });
+        userModel.listAll(params, "list-all");
     }
 
     private void onAddClicked() {
@@ -103,34 +87,32 @@ public class QuestionIndexFragment extends MyFragment implements ICallback<Quest
         fragmentCommunicate.communicate(params, fragmentName);
     }
 
-    private void mapping() {
+    private void mapping(){
         btnAdd = (Button) v.findViewById(R.id.btnAdd);
         lvMain = (ListView) v.findViewById(R.id.lvMain);
         txtMessage = (TextView) v.findViewById(R.id.txtMessage);
     }
 
-    public void onChangeData(HashMap<String, String> params) {
-        onListAll();
-    }
-
-    // DATABASE CALLBACK
     @Override
-    public void itemCallBack(Question item, String tag) {
+    public void itemCallBack(MyUser item, String tag) {
     }
 
     @Override
-    public void listCallBack(ArrayList<Question> items, String tag) {
+    public void listCallBack(ArrayList<MyUser> items, String tag) {
         if (tag == "list-all") onListAllCallback(items);
     }
 
-    private void onListAllCallback(ArrayList<Question> items) {
-        questionArrayList.clear();
 
+    private void onListAllCallback(ArrayList<MyUser> items) {
+        userArrayList.clear();
         // solve message
-        Helper.solveListMessage(items.isEmpty(), lvMain, txtMessage, "No question, yet.");
+        Helper.solveListMessage(items.isEmpty(), lvMain, txtMessage, "No user, yet.");
         if (!items.isEmpty()) {
-            questionArrayList.addAll(items);
+            userArrayList.addAll(items);
+            for (MyUser user:userArrayList){
+                Log.d("xxx", "User id: "+user.getId());
+            }
         }
-        questionAdapter.notifyDataSetChanged();
+        userAdapter.notifyDataSetChanged();
     }
 }

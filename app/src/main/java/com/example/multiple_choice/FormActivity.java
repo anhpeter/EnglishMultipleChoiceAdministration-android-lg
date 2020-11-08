@@ -20,10 +20,9 @@ import MainFragments.QuestionFormFragment;
 import MainFragments.QuestionFormTitleBarFragment;
 import MainFragments.QuestionIndexFragment;
 
-public class FormActivity extends AppCompatActivity implements FragmentCommunicate{
+public class FormActivity extends Activity implements FragmentCommunicate{
 
     FragmentManager fragmentManager;
-    String controller;
     HashMap<String, String> myParams;
     QuestionFormFragment questionFormFragment;
 
@@ -38,7 +37,6 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
         if(b != null){
             // form params
             HashMap<String, String> params = (HashMap<String, String>) b.getSerializable("params");
-            controller = params.get("controller");
             myParams = new HashMap<>();
             myParams.putAll(params);
             callFragments();
@@ -51,8 +49,8 @@ public class FormActivity extends AppCompatActivity implements FragmentCommunica
     }
 
     private void callFragments() {
-        if (controller.equals("questions")) callQuestionFragments();
-        else if (controller.equals("users")) callUserFragments();
+        if (getController().equals("questions")) callQuestionFragments();
+        else if (getController().equals("users")) callUserFragments();
     }
 
     private void callQuestionFragments() {

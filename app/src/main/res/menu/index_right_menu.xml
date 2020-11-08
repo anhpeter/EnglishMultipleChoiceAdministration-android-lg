@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/menuLogout"
-        android:title="Logout" />
+
+        <item
+            android:id="@+id/menuQuestion"
+            android:title="Question" />
+
+        <item
+            android:id="@+id/menuUser"
+            android:title="User" />
+
+        <item
+            android:id="@+id/menuLogout"
+            android:title="Logout" />
 </menu>

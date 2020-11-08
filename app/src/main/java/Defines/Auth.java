@@ -22,7 +22,7 @@ public class Auth {
 
     public boolean loginByUsernameAndPassword(String username, String password) {
         if (username.equals("admin") && password.equals("1234")) {
-            MyUser user = new MyUser(null, "admin", "1234", true);
+            MyUser user = new MyUser(null, "admin", "1234", true, "");
             setUser(user);
             return true;
         } else {
@@ -39,7 +39,7 @@ public class Auth {
     public MyUser getUserByUsername(String username) {
         MyUser user = null;
         if (username.equals("admin")) {
-            user = new MyUser(null, "admin", "1234", true);
+            user = new MyUser(null, "admin", "1234", true, "");
         }
         return user;
     }

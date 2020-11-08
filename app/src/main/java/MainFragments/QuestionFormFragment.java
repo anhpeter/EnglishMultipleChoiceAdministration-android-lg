@@ -32,6 +32,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.example.multiple_choice.Activity;
+import com.example.multiple_choice.FormActivity;
 import com.example.multiple_choice.R;
 import com.squareup.picasso.Picasso;
 
@@ -49,7 +51,7 @@ import Helpers.MyStorage;
 import Helpers.QuestionPictureManager;
 import Models.QuestionModel;
 
-public class QuestionFormFragment extends Fragment implements ICallback<Question>, IMyStorage {
+public class QuestionFormFragment extends MyFragment implements ICallback<Question>, IMyStorage {
 
     String fragmentName = "question-form";
     FragmentCommunicate fragmentCommunicate;
@@ -189,7 +191,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         spinnerLevel.setAdapter(adapter);
 
         // easy is default
-        spinnerLevel.setSelection(getLevelPos(params.get("level")));
+        spinnerLevel.setSelection(getLevelPos(getCalledActivity().getQuestionLevel()));
         spinnerLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -286,7 +288,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
     }
 
     private String getQuestionLevelValue() {
-        String result = params.get("level");
+        String result = getCalledActivity().getQuestionLevel();
         /*
         int pos = spinnerLevel.getSelectedItemPosition();
         result = levelValues[pos];
@@ -341,7 +343,6 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         // form params
         params = (HashMap<String, String>) b.getSerializable("params");
         String id = params.get("id");
-        String defaultLevel = params.get("level");
         formType = params.get("formType");
         if (formType.equals("edit") && id != null) {
             getItemById(id);
@@ -514,6 +515,7 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
 
     private void onAddItemCallBack(Question item) {
         Toast.makeText(getActivity(), "Item  added", Toast.LENGTH_SHORT).show();
+        resetAll();
     }
 
     private void onDeleteItemCallback() {
@@ -573,6 +575,19 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         setDefaultPictureQuestionParams();
     }
 
+    public void resetAll(){
+        pictureA.setImageResource(R.drawable.add_picture);
+        pictureB.setImageResource(R.drawable.add_picture);
+        pictureC.setImageResource(R.drawable.add_picture);
+        pictureD.setImageResource(R.drawable.add_picture);
+        rltUploadProgress.setVisibility(View.GONE);
+        edtQuestion.setText("");
+        edtAnswerA.setText("");
+        edtAnswerB.setText("");
+        edtAnswerC.setText("");
+        edtAnswerD.setText("");
+    }
+
     public void showInValidMessage() {
         Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
     }
@@ -582,5 +597,4 @@ public class QuestionFormFragment extends Fragment implements ICallback<Question
         progressArr = new double[]{0, 0, 0, 0};
         progress = 0;
     }
-
 }

@@ -1,44 +1,29 @@
 package com.example.multiple_choice;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Switch;
 import android.widget.Toast;
 
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 
 import Defines.Auth;
 import Defines.FragmentCommunicate;
-import Defines.User;
 import Helpers.Helper;
 import MainFragments.IndexTitleBarFragment;
-import MainFragments.QuestionFormFragment;
 import MainFragments.QuestionIndexFragment;
+import MainFragments.UserIndexFragment;
 
-public class MainActivity extends AppCompatActivity implements FragmentCommunicate {
+public class MainActivity extends Activity implements FragmentCommunicate {
 
     FragmentManager fragmentManager;
-    String controller;
-    String questionLevel;
     IndexTitleBarFragment indexTitleBarFragment;
     QuestionIndexFragment questionIndexFragment;
-    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
+    UserIndexFragment userIndexFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     private void checkAuth() {
         Auth auth = Auth.getInstance();
         if (auth.getUser()== null) {
-            SharedPreferences sharedPreferences = getSharedPreferences("global-package", Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedParams();
             if (sharedPreferences != null) {
                 String loggedUsername = sharedPreferences.getString("loggedUsername", "");
                 if (!loggedUsername.equals("")) {
@@ -72,46 +57,43 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     }
 
     private void onInit() {
-        controller = "questions";
-        questionLevel = "easy";
         fragmentManager = getFragmentManager();
         Helper.initFontAwesome(getApplicationContext(), getWindow().getDecorView());
     }
 
     private void callFragments() {
-        if (controller.equals("questions")) callQuestionFragments();
-        else if (controller.equals("users")) callUserFragments();
-    }
-
-    private void callQuestionFragments() {
-        Bundle b = new Bundle();
-        HashMap<String, String> params = new HashMap<>();
-        params.put("controller", controller);
-        params.put("questionLevel", questionLevel);
-        b.putSerializable("params", params);
-
         // title bar
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         indexTitleBarFragment = new IndexTitleBarFragment();
-        indexTitleBarFragment.setArguments(b);
         fragmentTransaction.add(R.id.indexTitleBarFrame, indexTitleBarFragment, "titleBar");
-
-        // index
-        questionIndexFragment = new QuestionIndexFragment();
-        questionIndexFragment.setArguments(b);
-        fragmentTransaction.add(R.id.indexFrame, questionIndexFragment, "index");
         fragmentTransaction.commit();
+        Toast.makeText(this, "call fragments", Toast.LENGTH_SHORT).show();
 
+        if (getController().equals("questions")) callQuestionFragments();
+        else if (getController().equals("users")) callUserFragments();
+    }
+
+    private void callQuestionFragments() {
+        Log.d("xxx", "call question fragment");
+        // index
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        questionIndexFragment = new QuestionIndexFragment();
+        fragmentTransaction.replace(R.id.indexFrame, questionIndexFragment, "question-index");
+        fragmentTransaction.commit();
     }
 
     private void callUserFragments() {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        userIndexFragment = new UserIndexFragment();
+        fragmentTransaction.replace(R.id.indexFrame, userIndexFragment, "user-index");
+        fragmentTransaction.commit();
     }
 
     @Override
     public void communicate(HashMap<String, String> data, String fromFragment) {
         switch (fromFragment) {
-            case "question-index-title-bar":
-                questionIndexTitleBarFragmentCommunicate(data);
+            case "index-title-bar":
+                indexTitleBarFragmentCommunicate(data);
                 break;
             case "question-index":
                 questionIndexCommunicate(data);
@@ -119,16 +101,23 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
         }
     }
 
-    private void questionIndexTitleBarFragmentCommunicate(HashMap<String, String> data) {
-        controller = data.get("controller");
-        if (controller == "questions") {
-            String newQuestionLevel = data.get("questionLevel");
-            QuestionIndexFragment indexFragment = (QuestionIndexFragment) fragmentManager.findFragmentByTag("index");
+    private void indexTitleBarFragmentCommunicate(HashMap<String, String> params) {
+        if (getController().equals("questions")) {
+            if (getIsChangingController()){
+                callQuestionFragments();
+                setIsChangingController(false);
+            }
+            QuestionIndexFragment indexFragment = (QuestionIndexFragment) fragmentManager.findFragmentByTag("question-index");
 
             // if new question level # current => on change
-            if (!questionLevel.equals(newQuestionLevel)) {
-                indexFragment.onChangeData(data);
-                questionLevel = newQuestionLevel;
+            if (getIsChangingQuestionLevel()) {
+                indexFragment.onChangeData(params);
+                setIsChangingQuestionLevel(false);
+            }
+        }else if (getController().equals("users")){
+            if (getIsChangingController()){
+                callUserFragments();
+                setIsChangingController(false);
             }
         }
     }
@@ -136,7 +125,6 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     private void questionIndexCommunicate(HashMap<String, String> data) {
         Intent i = new Intent(MainActivity.this, FormActivity.class);
         Bundle b = new Bundle();
-        data.put("controller", controller);
         b.putSerializable("params", data);
         i.putExtra("package", b);
         startActivity(i);
@@ -145,7 +133,9 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     @Override
     protected void onResume() {
         super.onResume();
-        questionIndexFragment.onListAll();
+        try{
+            questionIndexFragment.onListAll();
+        }catch (Exception e){}
     }
 
     @Override

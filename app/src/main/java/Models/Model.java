@@ -1,7 +1,6 @@
 package Models;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -16,8 +15,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
-
-import Defines.User;
 
 public abstract class Model {
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();

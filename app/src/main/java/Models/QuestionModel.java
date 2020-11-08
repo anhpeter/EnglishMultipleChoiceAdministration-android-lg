@@ -2,22 +2,13 @@ package Models;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,8 +17,6 @@ import java.util.Map;
 
 import Defines.ICallback;
 import Defines.Question;
-import Defines.User;
-import MainFragments.QuestionIndexFragment;
 
 public class QuestionModel extends Model {
 
@@ -40,7 +29,6 @@ public class QuestionModel extends Model {
 
     @Override
     public void listAll(final HashMap<String, String> params, final String tag) {
-        Log.d("xxx", "list-all params level: " + params.get("level"));
         db.collection(collection)
                 .whereIn("level", Arrays.asList(params.get("level")))
                 .orderBy("created", Query.Direction.DESCENDING)
@@ -122,7 +110,6 @@ public class QuestionModel extends Model {
             db.collection(collection).add(question.getDocData()).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
-                    Log.d("xxx", "doc " + documentReference.getId() + " added");
                 }
             });
         }

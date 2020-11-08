@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import Defines.Auth;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
 
     EditText edtUsername, edtPassword;
     Button btnSubmit;
@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
                     Auth auth = Auth.getInstance();
                     auth.loginByUsernameAndPassword(username, password);
                     if (auth.isLogged()) {
-                        SharedPreferences sharedPreferences = getSharedPreferences("global-package", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPreferences = getSharedParams();
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString("loggedUsername", username);
                         editor.apply();

@@ -112,5 +112,4 @@ public class QuestionFormTitleBarFragment extends Fragment{
         btnBack = (Button) v.findViewById(R.id.btnBack);
         btnDelete = (Button) v.findViewById(R.id.btnDelete);
     }
-
 }
