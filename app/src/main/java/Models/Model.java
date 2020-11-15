@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -14,10 +15,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.WriteBatch;
 
+
+
+
 import java.util.HashMap;
 
 public abstract class Model {
     protected FirebaseFirestore db = FirebaseFirestore.getInstance();
+    protected FirebaseDatabase realtimeDb = FirebaseDatabase.getInstance();
     protected String collection;
     protected Activity activity;
 
@@ -56,6 +61,10 @@ public abstract class Model {
         return db;
     }
 
+    public FirebaseDatabase getRealtimeDb(){
+        return realtimeDb;
+    }
+
     public void setDb(FirebaseFirestore db) {
         this.db = db;
     }
@@ -75,5 +84,6 @@ public abstract class Model {
     public void setActivity(Activity activity) {
         this.activity = activity;
     }
+
 
 }

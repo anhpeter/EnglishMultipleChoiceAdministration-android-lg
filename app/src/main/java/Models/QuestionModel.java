@@ -2,8 +2,15 @@ package Models;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
@@ -29,6 +36,21 @@ public class QuestionModel extends Model {
 
     @Override
     public void listAll(final HashMap<String, String> params, final String tag) {
+        Log.d("xxx", "list-all");
+        DatabaseReference myRef = getRealtimeDb().getReference("Users");
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot userSnapshot: snapshot.getChildren()){
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         db.collection(collection)
                 .whereIn("level", Arrays.asList(params.get("level")))
                 .orderBy("created", Query.Direction.DESCENDING)
