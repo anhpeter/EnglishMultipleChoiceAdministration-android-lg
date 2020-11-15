@@ -6,14 +6,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
 
 
@@ -21,7 +15,6 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.HashMap;
 
 public abstract class Model {
-    protected FirebaseFirestore db = FirebaseFirestore.getInstance();
     protected FirebaseDatabase realtimeDb = FirebaseDatabase.getInstance();
     protected String collection;
     protected Activity activity;
@@ -32,41 +25,19 @@ public abstract class Model {
     }
 
     // MANIPULATE DATA
-    public void deleteCollection(){
-        db.collection(collection).addSnapshotListener(activity, new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                WriteBatch batch = db.batch();
-                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                    DocumentReference laRef = db.collection(collection).document(queryDocumentSnapshot.getId());
-                    batch.delete(laRef);
-                }
-                batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("xxx", "collection "+collection+" deleted");
-                    }
-                });
-            }
-        });
-    }
-
     // ABSTRACT METHODS
     abstract public void listAll(final HashMap<String, String> params, final String tag);
 
     abstract public void getItemById(String id, final String tag);
 
     // GETTER & SETTER
-    public FirebaseFirestore getDb(){
-        return db;
-    }
 
     public FirebaseDatabase getRealtimeDb(){
         return realtimeDb;
     }
 
-    public void setDb(FirebaseFirestore db) {
-        this.db = db;
+    public DatabaseReference getCollectionRef(){
+        return getRealtimeDb().getReference().child(collection);
     }
 
     public String getCollection() {

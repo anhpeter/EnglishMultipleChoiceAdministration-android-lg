@@ -11,7 +11,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.multiple_choice.R;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.sql.Timestamp;
 
 import Defines.FontManager;
 
@@ -68,10 +71,46 @@ public class Helper {
         }
     }
 
+    public static boolean getBooleanByDataSnapshot(DataSnapshot snapshot, String key, boolean defaultValue){
+        try{
+            String booleanStr = snapshot.child(key).getValue().toString();
+            if (booleanStr == "true") return true;
+            else return false;
+        }catch(Exception e){
+            return defaultValue;
+        }
+    }
+
+    public static String getStringByDataSnapshot(DataSnapshot snapshot, String key, String defaultValue){
+        try{
+            return snapshot.child(key).getValue().toString();
+        }catch(Exception e){
+            return defaultValue;
+        }
+    }
+
     public static String getUppercaseFirstCharacter(String string){
         string = (string!=null) ? string : "";
         if (string.trim()!="") return (string.charAt(0)+"").toUpperCase();
         return string;
     }
+
+    public static int getRandom(int min, int max){
+        return (int)(Math.floor( min+ Math.random()*(max-min)));
+    }
+
+    public static String ucFirst(String value){
+        String result = null;
+        if (value!=null){
+            result=value.substring(0, 1).toUpperCase()+value.substring(1);
+        }
+        return result;
+    }
+
+    public static long getTime(){
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        return timestamp.getTime();
+    }
+
 
 }

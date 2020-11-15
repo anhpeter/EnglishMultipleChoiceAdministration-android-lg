@@ -26,8 +26,6 @@ public class Auth {
             setUser(user);
             return true;
         } else {
-            Log.d("xxx", "username: " + username);
-            Log.d("xxx", "password: " + password);
             return false;
         }
     }
@@ -47,7 +45,6 @@ public class Auth {
     public boolean isLogged() {
         if (getUser() != null) return true;
         else {
-            Log.d("xxx", "login failed: " + getUser());
             return false;
         }
 

@@ -2,6 +2,7 @@ package Defines;
 
 import android.util.Log;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -10,8 +11,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Question {
+import Helpers.Helper;
 
+public class Question {
+    private static String[] levelArr = {"easy", "normal", "hard", "memes", "games"};
     private String id;
     private String question;
     private String correctAnswer;
@@ -22,19 +25,21 @@ public class Question {
     private String questionType; // text | picture
     private String level; // hard | medium | easy
     private long created;
+    private long lastInteracted;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted) {
         this.setId(id);
         this.setQuestion(question);
-        this.setCorrectAnswer(correctAnswer);
         this.setAnswerA(answerA);
         this.setAnswerB(answerB);
         this.setAnswerC(answerC);
         this.setAnswerD(answerD);
+        this.setCorrectAnswer(correctAnswer);
         this.setQuestionType(questionType);
         this.setLevel(level);
         this.setCreated(created);
+        this.setLastInteracted(lastInteracted);
     }
 
     public String getQuestion() {
@@ -106,12 +111,10 @@ public class Question {
     }
 
     public void setCreated(long created) {
-        if (created <= 0 ){
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            System.out.println(timestamp);
-            this.created = (this.created > 0) ? this.created : timestamp.getTime();
-        }
-        else this.created = created;
+        if (created <= 0) {
+            this.created = (this.created > 0) ? this.created : Helper.getTime();
+            this.setLastInteracted(this.created);
+        } else this.created = created;
     }
 
     public String getId() {
@@ -123,52 +126,117 @@ public class Question {
     }
 
 
-    public static Question getQuestionBySnapshot(DocumentSnapshot queryDocumentSnapshot){
-        if (queryDocumentSnapshot != null){
-            String id = queryDocumentSnapshot.getId();
-            String question = queryDocumentSnapshot.getString("question");
-            String correctAnswer = queryDocumentSnapshot.getString("correctAnswer");
-            String answerA = queryDocumentSnapshot.getString("answerA");
-            String answerB = queryDocumentSnapshot.getString("answerB");
-            String answerC = queryDocumentSnapshot.getString("answerC");
-            String answerD = queryDocumentSnapshot.getString("answerD");
-            boolean isImageAnswer = queryDocumentSnapshot.getBoolean("isImageAnswer");
+    public static Question getQuestionByDataSnapshot(DataSnapshot dataSnapshot) {
+        if (dataSnapshot != null) {
+            String id = dataSnapshot.getKey();
+            String question = dataSnapshot.child("Question").getValue().toString();
+            String correctAnswer = dataSnapshot.child("CorrectAnswer").getValue().toString();
+            String answerA = dataSnapshot.child("A").getValue().toString();
+            String answerB = dataSnapshot.child("B").getValue().toString();
+            String answerC = dataSnapshot.child("C").getValue().toString();
+            String answerD = dataSnapshot.child("D").getValue().toString();
+            boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
             String questionType = (isImageAnswer) ? "picture" : "text";
-            String level = queryDocumentSnapshot.getString("level");
-            long created;
-            try{
-                created  = Integer.parseInt(queryDocumentSnapshot.getString("created"));
-            }catch (Exception e){
-                created = -1;
-            }
-            Question qt  = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created);
+            String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
+            String level = getLevelByCategoryId(categoryId);
+            long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
+            long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
+            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created , lastInteracted);
             return qt;
-        }else return null;
+        } else return null;
     }
 
-    public HashMap<String, Object> getDocData(){
+    public HashMap<String, Object> getDocData() {
         HashMap<String, Object> docData = new HashMap<>();
-        docData.put("question", getQuestion());
-        docData.put("answerA", getAnswerA());
-        docData.put("answerB", getAnswerB());
-        docData.put("answerC", getAnswerC());
-        docData.put("answerD", getAnswerD());
-        docData.put("correctAnswer", getCorrectAnswer());
-        docData.put("isImageAnswer", getIsImageAnswer());
-        docData.put("level", getLevel());
-        docData.put("created", getCreated()+"");
+        docData.put("Question", getQuestion());
+        docData.put("A", getAnswerA());
+        docData.put("B", getAnswerB());
+        docData.put("C", getAnswerC());
+        docData.put("D", getAnswerD());
+        docData.put("CorrectAnswer", getCorrectAnswer());
+        docData.put("IsImageAnswer", getIsImageAnswer());
+        docData.put("CategoryId", Question.getCategoryIdByLevel(getLevel()));
+        docData.put("Created", getCreated() + "");
+        docData.put("LastInteracted", getLastInteracted() + "");
+        docData.put("IsImageQuestion", "false");
         return docData;
     }
 
-    public boolean getIsImageAnswer(){
+    public boolean getIsImageAnswer() {
         return (getQuestionType().equals("text")) ? false : true;
     }
 
-    public String getInfo(){
-        return getId()+ ", "+getQuestion()+", "+getQuestionType()+", "+getLevel()+", "+getCorrectAnswer()+", "+getAnswerA()+", "+getAnswerB()+", "+getAnswerC()+", "+getAnswerD()+", "+getCreated();
+    public String getInfo() {
+        return getId() + ", " + getQuestion() + ", " + getQuestionType() + ", " + getLevel() + ", " + getCorrectAnswer() + ", " + getAnswerA() + ", " + getAnswerB() + ", " + getAnswerC() + ", " + getAnswerD() + ", " + getCreated();
     }
 
-    public boolean getIsImageQuestion(){
+    public String getCorrectAnswerInLetter() {
+        String letter = null;
+        if (getAnswerA().equals(getCorrectAnswer())) letter = "A";
+        else if (getAnswerB().equals(getCorrectAnswer())) letter = "B";
+        else if (getAnswerC().equals(getCorrectAnswer())) letter = "C";
+        else if (getAnswerD().equals(getCorrectAnswer())) letter = "D";
+        return letter;
+    }
+
+    public boolean getIsImageQuestion() {
         return false;
+    }
+
+    // additional solve
+    public void generateCorrectAnswerByLetter(String correctAnswerInLetter){
+        if (correctAnswerInLetter.equals("A")) this.setCorrectAnswer(getAnswerA());
+        if (correctAnswerInLetter.equals("B")) this.setCorrectAnswer(getAnswerB());
+        if (correctAnswerInLetter.equals("C")) this.setCorrectAnswer(getAnswerC());
+        if (correctAnswerInLetter.equals("D")) this.setCorrectAnswer(getAnswerD());
+
+    }
+
+    // LEVEL & CATEGORY
+    public static String[] getLevelArr(){
+        return levelArr;
+    }
+
+    public static String[] getSpinnerLevelArr(){
+        String levelArr[] = getLevelArr();
+        String spinnerLevelArr[] = new String[levelArr.length];
+        for (int i = 0; i< levelArr.length;i++){
+            spinnerLevelArr[i] = Helper.ucFirst(levelArr[i]);
+        }
+        return spinnerLevelArr;
+    }
+
+    public static String getLevelByCategoryId(String id){
+        int numberId = Integer.parseInt(id)-1;
+        String level = Question.getLevelByIndex(numberId);
+        return level;
+    }
+
+    public static String getLevelByIndex(int i){
+        String levelArr[] = getLevelArr();
+        return levelArr[i];
+    }
+
+    public static int getLevelIndexByLevel(String level){
+        String levelArr[] = getLevelArr();
+        for (int i =0; i< levelArr.length; i++){
+            String lv = levelArr[i].toLowerCase();
+            String currentLevel = level.toLowerCase();
+            if (currentLevel.equals(lv)) return i;
+        }
+        return 0;
+    }
+
+    public static String getCategoryIdByLevel(String level){
+        int levelIndex = getLevelIndexByLevel(level);
+        return "0"+(levelIndex+1);
+    }
+
+    public void setLastInteracted(long value){
+        lastInteracted = value;
+    }
+
+    public long getLastInteracted(){
+        return lastInteracted;
     }
 }

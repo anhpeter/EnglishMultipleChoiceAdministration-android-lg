@@ -74,7 +74,6 @@ public class MainActivity extends Activity implements FragmentCommunicate {
     }
 
     private void callQuestionFragments() {
-        Log.d("xxx", "call question fragment");
         // index
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         questionIndexFragment = new QuestionIndexFragment();
@@ -134,7 +133,7 @@ public class MainActivity extends Activity implements FragmentCommunicate {
     protected void onResume() {
         super.onResume();
         try{
-            questionIndexFragment.onListAll();
+            //questionIndexFragment.onListAll();
         }catch (Exception e){}
     }
 

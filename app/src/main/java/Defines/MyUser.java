@@ -1,5 +1,6 @@
 package Defines;
 
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import Helpers.Helper;
@@ -78,6 +79,23 @@ public class MyUser {
             MyUser user  = new MyUser(id, username, password, isAdmin, email);
             return user;
         }else return null;
+    }
+
+    public static MyUser getUserByDataSnapshot(DataSnapshot dataSnapshot) {
+        if (dataSnapshot != null) {
+            String id = dataSnapshot.getKey();
+            String username = dataSnapshot.child("userName").getValue().toString();
+            String passWord = dataSnapshot.child("passWord").getValue().toString();
+            String email = Helper.getStringByDataSnapshot(dataSnapshot, "email", null);
+            long created;
+            try {
+                created = Integer.parseInt(dataSnapshot.child("created").getValue().toString());
+            } catch (Exception e) {
+                created = -1;
+            }
+            MyUser user = new MyUser(id, username, passWord, false, email);
+            return user;
+        } else return null;
     }
 
     // GETTER AND SETTER

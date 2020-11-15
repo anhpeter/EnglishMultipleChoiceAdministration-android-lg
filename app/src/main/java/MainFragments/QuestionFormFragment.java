@@ -226,11 +226,25 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         String answerC = edtAnswerC.getText().toString().trim();
         String answerD = edtAnswerD.getText().toString().trim();
         if (isTextQuestionOptionValid(answerA, answerB, answerC, answerD)) {
+
             questionPictureManager.deleteAllIfExist();
-            Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswer"),
-                    answerA, answerB, answerC, answerD, saveParams.get("questionType"), saveParams.get("level"), -1);
-            if (formType.equals("edit")) solveEdit(questionObj);
-            else if (formType.equals("add")) solveAdd(questionObj);
+            if (formType.equals("edit")) {
+                item.setQuestion(saveParams.get("question"));
+                item.setAnswerA(answerA);
+                item.setAnswerB(answerB);
+                item.setAnswerC(answerC);
+                item.setAnswerD(answerD);
+                item.setQuestionType(saveParams.get("questionType"));
+                item.setLevel(saveParams.get("level"));
+                item.setLastInteracted(Helper.getTime());
+                solveEdit(item);
+            } else if (formType.equals("add")) {
+                Question questionObj = new Question(null, saveParams.get("question"), null,
+                        answerA, answerB, answerC, answerD, saveParams.get("questionType"), saveParams.get("level"),
+                        Helper.getTime(), Helper.getTime());
+                questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
+                solveAdd(questionObj);
+            }
         } else {
             showInValidMessage();
         }
@@ -282,7 +296,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                 !saveParams.get("question").isEmpty() &&
                         !saveParams.get("questionType").isEmpty() &&
                         !saveParams.get("level").isEmpty() &&
-                        !saveParams.get("correctAnswer").trim().isEmpty()
+                        !saveParams.get("correctAnswerInLetter").trim().isEmpty()
         ) return true;
         return false;
     }
@@ -451,12 +465,24 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     public void savePictureQuestion() {
         Log.d("xxx", "on save");
         HashMap<String, String> saveParams = getSaveParams();
-        Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswer"),
-                questionPictureManager.getAnswerAPath(),
-                questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
-                saveParams.get("questionType"), saveParams.get("level"), -1);
-        if (formType.equals("edit")) solveEdit(questionObj);
-        else if (formType.equals("add")) solveAdd(questionObj);
+        if (formType.equals("edit")){
+            item.setQuestion(saveParams.get("question"));
+            item.setAnswerA(questionPictureManager.getAnswerAPath());
+            item.setAnswerB(questionPictureManager.getAnswerBPath());
+            item.setAnswerC(questionPictureManager.getAnswerCPath());
+            item.setAnswerD(questionPictureManager.getAnswerDPath());
+            item.setQuestionType(saveParams.get("questionType"));
+            item.setLevel(saveParams.get("level"));
+            item.setLastInteracted(Helper.getTime());
+            solveEdit(item);
+        }
+        else if (formType.equals("add")){
+            Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswerInLetter"),
+                    questionPictureManager.getAnswerAPath(),
+                    questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
+                    saveParams.get("questionType"), saveParams.get("level"), Helper.getTime(), Helper.getTime());
+            solveAdd(questionObj);
+        }
     }
 
     @Override
@@ -493,7 +519,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         edtAnswerB.setText(item.getAnswerB());
         edtAnswerC.setText(item.getAnswerC());
         edtAnswerD.setText(item.getAnswerD());
-        ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
+        ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswerInLetter()))).setChecked(true);
     }
 
     private void setPictureQuestionView() {
@@ -554,7 +580,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         saveParams.put("question", question);
         saveParams.put("level", level);
         saveParams.put("questionType", questionType);
-        saveParams.put("correctAnswer", correctAnswer);
+        saveParams.put("correctAnswerInLetter", correctAnswer);
         return saveParams;
     }
 
@@ -575,7 +601,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         setDefaultPictureQuestionParams();
     }
 
-    public void resetAll(){
+    public void resetAll() {
         pictureA.setImageResource(R.drawable.add_picture);
         pictureB.setImageResource(R.drawable.add_picture);
         pictureC.setImageResource(R.drawable.add_picture);

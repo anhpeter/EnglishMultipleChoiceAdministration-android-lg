@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,7 @@ import com.example.multiple_choice.R;
 import java.util.HashMap;
 
 import Defines.FragmentCommunicate;
+import Defines.Question;
 import Helpers.Helper;
 
 public class IndexTitleBarFragment extends MyFragment {
@@ -95,7 +97,7 @@ public class IndexTitleBarFragment extends MyFragment {
 
     private void initSpinner() {
         solveQuestionLevelSpinnerVisibility();
-        String[] spinnerItems = {"Hard question", "Medium question", "Easy question"};
+        String[] spinnerItems = Question.getSpinnerLevelArr();
         ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), R.layout.spinner_item, spinnerItems);
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         spinnerController.setAdapter(adapter);
@@ -204,20 +206,12 @@ public class IndexTitleBarFragment extends MyFragment {
     }
 
     private int getSpinnerItemPosition() {
-        int position = 0;
-        String questionLevel = getCalledActivity().getQuestionLevel();
-        if (questionLevel.equals("medium")) position = 1;
-        else if (questionLevel.equals("easy")) position = 2;
+        int position = Question.getLevelIndexByLevel(getCalledActivity().getQuestionLevel());
         return position;
     }
 
     private void setQuestionLevel(int position) {
-        String questionLevel = "easy";
-        if (position == 0) {
-            questionLevel = "hard";
-        } else if (position == 1) {
-            questionLevel = "medium";
-        }
+        String questionLevel = Question.getLevelByIndex(position);
         if (!getCalledActivity().getQuestionLevel().equals(questionLevel)){
             getCalledActivity().setIsChangingQuestionLevel(true);
             getCalledActivity().setQuestionLevel(questionLevel);

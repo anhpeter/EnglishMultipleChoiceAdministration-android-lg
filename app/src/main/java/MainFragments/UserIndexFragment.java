@@ -109,9 +109,6 @@ public class UserIndexFragment extends MyFragment implements ICallback<MyUser> {
         Helper.solveListMessage(items.isEmpty(), lvMain, txtMessage, "No user, yet.");
         if (!items.isEmpty()) {
             userArrayList.addAll(items);
-            for (MyUser user:userArrayList){
-                Log.d("xxx", "User id: "+user.getId());
-            }
         }
         userAdapter.notifyDataSetChanged();
     }
