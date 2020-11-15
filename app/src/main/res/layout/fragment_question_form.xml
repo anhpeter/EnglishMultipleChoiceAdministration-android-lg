@@ -28,17 +28,6 @@
         android:maxLines="2"></EditText>
 
     <!-- OPTION -->
-    <TextView
-        android:id="@+id/txtQuestionType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_below="@id/txtQuestion"
-        android:layout_marginTop="75dp"
-        android:text="Type."
-
-        android:textSize="16sp"></TextView>
-
     <RadioGroup
         android:id="@+id/radioGroupQuestionType"
         android:layout_width="200dp"
@@ -51,16 +40,20 @@
 
         <RadioButton
             android:id="@+id/radioButtonText"
+            android:button="@drawable/blue_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
+            android:paddingLeft="10dp"
             android:text="Text"></RadioButton>
 
         <RadioButton
             android:id="@+id/radioButtonPicture"
+            android:button="@drawable/blue_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:paddingLeft="10dp"
             android:text="Picture"
 
             ></RadioButton>
@@ -96,6 +89,7 @@
         android:id="@+id/rltAnswerWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:layout_below="@+id/radioGroupQuestionType">
 
         <!-- TEXT ANSWER -->
@@ -121,6 +115,7 @@
 
                     <RadioButton
                         android:id="@+id/radioA"
+                        android:button="@drawable/green_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -128,18 +123,21 @@
 
                     <RadioButton
                         android:id="@+id/radioB"
+                        android:button="@drawable/green_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"></RadioButton>
 
                     <RadioButton
                         android:id="@+id/radioC"
+                        android:button="@drawable/green_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"></RadioButton>
 
                     <RadioButton
                         android:id="@+id/radioD"
+                        android:button="@drawable/green_checkbox"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"></RadioButton>
@@ -200,6 +198,7 @@
                 >
                 <RadioButton
                     android:id="@+id/radioPictureA"
+                    android:button="@drawable/green_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -216,6 +215,7 @@
                 </ImageView>
                 <RadioButton
                     android:id="@+id/radioPictureB"
+                    android:button="@drawable/green_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -243,6 +243,7 @@
                 >
                 <RadioButton
                     android:id="@+id/radioPictureC"
+                    android:button="@drawable/green_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -259,6 +260,7 @@
                 </ImageView>
                 <RadioButton
                     android:id="@+id/radioPictureD"
+                    android:button="@drawable/green_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -309,13 +311,15 @@
     <!-- SUBMIT BUTTON -->
     <Button
         android:id="@+id/btnSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="40dp"
 
         android:layout_below="@id/rltAnswerWrapper"
         android:layout_centerHorizontal="true"
 
         android:layout_marginTop="40dp"
+        android:background="@drawable/save_button"
+        android:textColor="#fff"
         android:text="Submit"
         android:textAllCaps="false"></Button>
 

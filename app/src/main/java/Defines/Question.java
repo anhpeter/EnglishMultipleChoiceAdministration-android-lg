@@ -24,11 +24,12 @@ public class Question {
     private String answerD;
     private String questionType; // text | picture
     private String level; // hard | medium | easy
+    private boolean isImageQuestion;
     private long created;
     private long lastInteracted;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted, boolean isImageQuestion) {
         this.setId(id);
         this.setQuestion(question);
         this.setAnswerA(answerA);
@@ -40,6 +41,7 @@ public class Question {
         this.setLevel(level);
         this.setCreated(created);
         this.setLastInteracted(lastInteracted);
+        this.setIsImageQuestion(isImageQuestion);
     }
 
     public String getQuestion() {
@@ -126,6 +128,7 @@ public class Question {
     }
 
 
+    // CREATE QUESTION BY FIREBASE DATA SNAPSHOT
     public static Question getQuestionByDataSnapshot(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
             String id = dataSnapshot.getKey();
@@ -136,16 +139,18 @@ public class Question {
             String answerC = dataSnapshot.child("C").getValue().toString();
             String answerD = dataSnapshot.child("D").getValue().toString();
             boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
+            boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
             String questionType = (isImageAnswer) ? "picture" : "text";
             String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
             String level = getLevelByCategoryId(categoryId);
             long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
             long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created , lastInteracted);
+            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created , lastInteracted, isImageQuestion);
             return qt;
         } else return null;
     }
 
+    // GET DOC FOR SAVING
     public HashMap<String, Object> getDocData() {
         HashMap<String, Object> docData = new HashMap<>();
         docData.put("Question", getQuestion());
@@ -158,7 +163,7 @@ public class Question {
         docData.put("CategoryId", Question.getCategoryIdByLevel(getLevel()));
         docData.put("Created", getCreated() + "");
         docData.put("LastInteracted", getLastInteracted() + "");
-        docData.put("IsImageQuestion", "false");
+        docData.put("IsImageQuestion", getIsImageQuestion());
         return docData;
     }
 
@@ -180,17 +185,17 @@ public class Question {
     }
 
     public boolean getIsImageQuestion() {
-        return false;
+        return isImageQuestion;
     }
 
-    // additional solve
-    public void generateCorrectAnswerByLetter(String correctAnswerInLetter){
-        if (correctAnswerInLetter.equals("A")) this.setCorrectAnswer(getAnswerA());
-        if (correctAnswerInLetter.equals("B")) this.setCorrectAnswer(getAnswerB());
-        if (correctAnswerInLetter.equals("C")) this.setCorrectAnswer(getAnswerC());
-        if (correctAnswerInLetter.equals("D")) this.setCorrectAnswer(getAnswerD());
-
+    public long getLastInteracted(){
+        return lastInteracted;
     }
+
+    public void setIsImageQuestion(boolean value){
+        isImageQuestion = value;
+    }
+
 
     // LEVEL & CATEGORY
     public static String[] getLevelArr(){
@@ -236,7 +241,14 @@ public class Question {
         lastInteracted = value;
     }
 
-    public long getLastInteracted(){
-        return lastInteracted;
+
+    // SUPPORTED METHODS
+    public void generateCorrectAnswerByLetter(String correctAnswerInLetter){
+        if (correctAnswerInLetter.equals("A")) this.setCorrectAnswer(getAnswerA());
+        if (correctAnswerInLetter.equals("B")) this.setCorrectAnswer(getAnswerB());
+        if (correctAnswerInLetter.equals("C")) this.setCorrectAnswer(getAnswerC());
+        if (correctAnswerInLetter.equals("D")) this.setCorrectAnswer(getAnswerD());
+
     }
+
 }

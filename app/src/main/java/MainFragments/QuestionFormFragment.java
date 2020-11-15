@@ -241,7 +241,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             } else if (formType.equals("add")) {
                 Question questionObj = new Question(null, saveParams.get("question"), null,
                         answerA, answerB, answerC, answerD, saveParams.get("questionType"), saveParams.get("level"),
-                        Helper.getTime(), Helper.getTime());
+                        Helper.getTime(), Helper.getTime(), false);
                 questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
                 solveAdd(questionObj);
             }
@@ -480,7 +480,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswerInLetter"),
                     questionPictureManager.getAnswerAPath(),
                     questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
-                    saveParams.get("questionType"), saveParams.get("level"), Helper.getTime(), Helper.getTime());
+                    saveParams.get("questionType"), saveParams.get("level"), Helper.getTime(), Helper.getTime(), false);
             solveAdd(questionObj);
         }
     }
