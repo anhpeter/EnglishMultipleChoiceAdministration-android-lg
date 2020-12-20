@@ -23,9 +23,11 @@
             android:backgroundTint="#fff"
             ></Spinner>
 
+
         <Button
             android:id="@+id/btnSearch"
             android:layout_width="50dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
 
             android:text="@string/fa_icon_search"

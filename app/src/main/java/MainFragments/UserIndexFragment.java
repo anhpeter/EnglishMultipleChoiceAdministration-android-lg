@@ -66,8 +66,12 @@ public class UserIndexFragment extends MyFragment implements ICallback<MyUser> {
     }
 
     public void onListAll() {
-        HashMap<String, String> params = new HashMap<>();
-        userModel.listAll(params, "list-all");
+        if (getCalledActivity().internetConnectionAvailable()){
+            HashMap<String, String> params = new HashMap<>();
+            userModel.listAll(params, "list-all");
+        }else{
+            Helper.solveListMessage(true, lvMain, txtMessage, "No Internet connection");
+        }
     }
 
     private void onAddClicked() {

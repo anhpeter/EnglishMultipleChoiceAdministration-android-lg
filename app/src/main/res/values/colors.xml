@@ -3,6 +3,25 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="lightGray">#0277bd</color>
     <color name="blue">#0277bd</color>
+    <color name="green">#8cc63f</color>
+    <color name="violet">#5b0ccf</color>
     <color name="orange">#FF9800</color>
+
+    <color name="light_success">#52C41A</color>
+    <color name="success">#28A745</color>
+    <color name="danger">#FF0033</color>
+    <color name="light">#F8F9FA</color>
+    <color name="default_color">#757575</color>
+    <color name="dark">#343a40</color>
+    <color name="correct_color">#2196F3</color>
+
+    <!-- QUIZ -->
+    <color name="quiz_red">#e21b3c</color>
+    <color name="quiz_blue">#1268cd</color>
+    <color name="quiz_yellow">#d89e00</color>
+    <color name="quiz_green">#26890b</color>
+    <color name="quiz_stroke">#D5D5D5</color>
+
 </resources>

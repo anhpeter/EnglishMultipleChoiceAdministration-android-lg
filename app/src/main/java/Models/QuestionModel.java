@@ -39,15 +39,15 @@ public class QuestionModel extends Model {
 
     @Override
     public void listAll(final HashMap<String, String> params, final String tag) {
-        getCollectionRef().addValueEventListener(new ValueEventListener() {
+        getCollectionRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ArrayList<Question> questionArrayList = new ArrayList<>();
-                for (DataSnapshot childSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     Question qt = Question.getQuestionByDataSnapshot(childSnapshot);
 
                     // FILTER
-                    if (qt.getLevel().equals(params.get("level"))){
+                    if (qt.getLevel().equals(params.get("level"))) {
                         questionArrayList.add(qt);
                     }
                 }
@@ -55,8 +55,7 @@ public class QuestionModel extends Model {
                 // SORT
                 Collections.sort(questionArrayList, new Comparator<Question>() {
                     @Override
-                    public int compare(Question q1, Question q2)
-                    {
+                    public int compare(Question q1, Question q2) {
                         boolean isSwap = q2.getLastInteracted() > q1.getLastInteracted();
                         if (isSwap) return 1;
                         else return -1;
@@ -82,7 +81,7 @@ public class QuestionModel extends Model {
     }
 
     public void addItem(final Question question, final String tag) {
-        final String id = Helper.getRandom(100000, 999999)+"";
+        final String id = Helper.getRandom(100000, 999999) + "";
         getCollectionRef().child(id).setValue(question.getDocData()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {

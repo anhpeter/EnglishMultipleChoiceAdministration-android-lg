@@ -27,9 +27,10 @@ public class Question {
     private boolean isImageQuestion;
     private long created;
     private long lastInteracted;
+    private boolean isSpeechQuestion;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted, boolean isImageQuestion) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isSpeechQuestion) {
         this.setId(id);
         this.setQuestion(question);
         this.setAnswerA(answerA);
@@ -42,6 +43,7 @@ public class Question {
         this.setCreated(created);
         this.setLastInteracted(lastInteracted);
         this.setIsImageQuestion(isImageQuestion);
+        this.setSpeechQuestion(isSpeechQuestion);
     }
 
     public String getQuestion() {
@@ -140,12 +142,16 @@ public class Question {
             String answerD = dataSnapshot.child("D").getValue().toString();
             boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
             boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
-            String questionType = (isImageAnswer) ? "picture" : "text";
+            boolean isSpeechQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsSpeechQuestion", false);
+            String questionType;
+            if (isSpeechQuestion) questionType = "speech";
+            else questionType = (isImageAnswer) ? "picture" : "text";
             String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
             String level = getLevelByCategoryId(categoryId);
             long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
             long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created , lastInteracted, isImageQuestion);
+            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created, lastInteracted, isImageQuestion, isSpeechQuestion);
+            Log.d("xxx", qt.getInfo());
             return qt;
         } else return null;
     }
@@ -159,20 +165,22 @@ public class Question {
         docData.put("C", getAnswerC());
         docData.put("D", getAnswerD());
         docData.put("CorrectAnswer", getCorrectAnswer());
-        docData.put("IsImageAnswer", getIsImageAnswer());
         docData.put("CategoryId", Question.getCategoryIdByLevel(getLevel()));
         docData.put("Created", getCreated() + "");
         docData.put("LastInteracted", getLastInteracted() + "");
-        docData.put("IsImageQuestion", getIsImageQuestion());
+        docData.put("IsImageQuestion", getIsImageQuestion() + "");
+        docData.put("IsImageAnswer", getIsImageAnswer() + "");
+        docData.put("IsSpeechQuestion", isSpeechQuestion() + "");
         return docData;
     }
 
     public boolean getIsImageAnswer() {
-        return (getQuestionType().equals("text")) ? false : true;
+        return (getQuestionType().equals("picture")) ? true : false;
     }
 
     public String getInfo() {
-        return getId() + ", " + getQuestion() + ", " + getQuestionType() + ", " + getLevel() + ", " + getCorrectAnswer() + ", " + getAnswerA() + ", " + getAnswerB() + ", " + getAnswerC() + ", " + getAnswerD() + ", " + getCreated();
+        return getId() + ";" + getQuestion() + ";" + getQuestionType() + ";" + getLevel() + ";" + getCorrectAnswer() + ";" + getAnswerA()
+                + ";" + getAnswerB() + ";" + getAnswerC() + ";" + getAnswerD() + ";" + getCreated();
     }
 
     public String getCorrectAnswerInLetter() {
@@ -188,43 +196,43 @@ public class Question {
         return isImageQuestion;
     }
 
-    public long getLastInteracted(){
+    public long getLastInteracted() {
         return lastInteracted;
     }
 
-    public void setIsImageQuestion(boolean value){
+    public void setIsImageQuestion(boolean value) {
         isImageQuestion = value;
     }
 
 
     // LEVEL & CATEGORY
-    public static String[] getLevelArr(){
+    public static String[] getLevelArr() {
         return levelArr;
     }
 
-    public static String[] getSpinnerLevelArr(){
+    public static String[] getSpinnerLevelArr() {
         String levelArr[] = getLevelArr();
         String spinnerLevelArr[] = new String[levelArr.length];
-        for (int i = 0; i< levelArr.length;i++){
+        for (int i = 0; i < levelArr.length; i++) {
             spinnerLevelArr[i] = Helper.ucFirst(levelArr[i]);
         }
         return spinnerLevelArr;
     }
 
-    public static String getLevelByCategoryId(String id){
-        int numberId = Integer.parseInt(id)-1;
+    public static String getLevelByCategoryId(String id) {
+        int numberId = Integer.parseInt(id) - 1;
         String level = Question.getLevelByIndex(numberId);
         return level;
     }
 
-    public static String getLevelByIndex(int i){
+    public static String getLevelByIndex(int i) {
         String levelArr[] = getLevelArr();
         return levelArr[i];
     }
 
-    public static int getLevelIndexByLevel(String level){
+    public static int getLevelIndexByLevel(String level) {
         String levelArr[] = getLevelArr();
-        for (int i =0; i< levelArr.length; i++){
+        for (int i = 0; i < levelArr.length; i++) {
             String lv = levelArr[i].toLowerCase();
             String currentLevel = level.toLowerCase();
             if (currentLevel.equals(lv)) return i;
@@ -232,23 +240,30 @@ public class Question {
         return 0;
     }
 
-    public static String getCategoryIdByLevel(String level){
+    public static String getCategoryIdByLevel(String level) {
         int levelIndex = getLevelIndexByLevel(level);
-        return "0"+(levelIndex+1);
+        return "0" + (levelIndex + 1);
     }
 
-    public void setLastInteracted(long value){
+    public void setLastInteracted(long value) {
         lastInteracted = value;
     }
 
-
     // SUPPORTED METHODS
-    public void generateCorrectAnswerByLetter(String correctAnswerInLetter){
+    public void generateCorrectAnswerByLetter(String correctAnswerInLetter) {
         if (correctAnswerInLetter.equals("A")) this.setCorrectAnswer(getAnswerA());
         if (correctAnswerInLetter.equals("B")) this.setCorrectAnswer(getAnswerB());
         if (correctAnswerInLetter.equals("C")) this.setCorrectAnswer(getAnswerC());
         if (correctAnswerInLetter.equals("D")) this.setCorrectAnswer(getAnswerD());
 
+    }
+
+    public boolean isSpeechQuestion() {
+        return isSpeechQuestion;
+    }
+
+    public void setSpeechQuestion(boolean speechQuestion) {
+        isSpeechQuestion = speechQuestion;
     }
 
 }

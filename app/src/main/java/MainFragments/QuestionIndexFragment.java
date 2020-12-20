@@ -40,6 +40,7 @@ public class QuestionIndexFragment extends MyFragment implements ICallback<Quest
     ListView lvMain;
     ArrayList<Question> questionArrayList;
     QuestionAdapter questionAdapter;
+    ArrayList<Question> searchQuestionArrayList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,9 +63,13 @@ public class QuestionIndexFragment extends MyFragment implements ICallback<Quest
     }
 
     public void onListAll() {
-        HashMap<String, String> params = new HashMap<>();
-        params.put("level", getCalledActivity().getQuestionLevel());
-        questionModel.listAll(params, "list-all");
+        if (getCalledActivity().internetConnectionAvailable()) {
+            HashMap<String, String> params = new HashMap<>();
+            params.put("level", getCalledActivity().getQuestionLevel());
+            questionModel.listAll(params, "list-all");
+        } else {
+            Helper.solveListMessage(true, lvMain, txtMessage, "No Internet connection");
+        }
     }
 
     private void initListView() {

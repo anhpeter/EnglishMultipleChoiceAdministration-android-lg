@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RadioGroup
+        android:id="@+id/radioGroupQuestionType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="20dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/radioButtonText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:button="@drawable/blue_checkbox"
+            android:checked="true"
+            android:paddingLeft="10dp"
+            android:text="Text"></RadioButton>
+
+        <RadioButton
+            android:id="@+id/radioButtonPicture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:button="@drawable/blue_checkbox"
+            android:paddingLeft="10dp"
+            android:text="Picture"></RadioButton>
+
+        <RadioButton
+            android:id="@+id/radioButtonSpeech"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:button="@drawable/blue_checkbox"
+            android:paddingLeft="10dp"
+            android:text="Speech"></RadioButton>
+    </RadioGroup>
+
+</RelativeLayout>
+

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rltPictureAnswer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- LINE 1 -->
+    <LinearLayout
+        android:id="@+id/linearPictureAnswerLine1"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <RadioButton
+            android:id="@+id/radioPictureA"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:button="@drawable/green_checkbox"></RadioButton>
+
+        <ImageView
+            android:id="@+id/pictureA"
+            android:layout_width="0dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center_vertical"
+            android:layout_toRightOf="@id/radioPictureA"
+            android:layout_weight="7"
+            android:background="@drawable/quize_light"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:src="@drawable/add_picture"></ImageView>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="2"></View>
+
+        <RadioButton
+            android:id="@+id/radioPictureB"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:button="@drawable/green_checkbox"></RadioButton>
+
+        <ImageView
+            android:id="@+id/pictureB"
+            android:layout_width="0dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center_vertical"
+            android:layout_toRightOf="@id/radioPictureA"
+            android:layout_weight="7"
+            android:background="@drawable/quize_light"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:src="@drawable/add_picture"></ImageView>
+    </LinearLayout>
+
+    <!-- LINE 2 -->
+    <LinearLayout
+        android:id="@+id/linearPictureAnswerLine2"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_below="@id/linearPictureAnswerLine1"
+        android:orientation="horizontal"
+        android:weightSum="20">
+
+        <RadioButton
+            android:id="@+id/radioPictureC"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:button="@drawable/green_checkbox"></RadioButton>
+
+        <ImageView
+            android:id="@+id/pictureC"
+            android:layout_width="0dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center_vertical"
+            android:layout_toRightOf="@id/radioPictureA"
+            android:layout_weight="7"
+            android:background="@drawable/quize_light"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:src="@drawable/add_picture"></ImageView>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="2"></View>
+
+        <RadioButton
+            android:id="@+id/radioPictureD"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:button="@drawable/green_checkbox"></RadioButton>
+
+        <ImageView
+            android:id="@+id/pictureD"
+            android:layout_width="0dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center_vertical"
+            android:layout_toRightOf="@id/radioPictureA"
+            android:layout_weight="7"
+            android:background="@drawable/quize_light"
+            android:scaleType="fitCenter"
+            android:padding="5dp"
+            android:src="@drawable/add_picture"></ImageView>
+    </LinearLayout>
+
+    <!-- UPLOAD PROGRESS -->
+    <RelativeLayout
+        android:id="@+id/rltProgressUpload"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_below="@id/linearPictureAnswerLine2"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressUpload"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/txtUploadProgress"
+            android:progressTint="#008EFF"></ProgressBar>
+
+        <TextView
+            android:id="@+id/txtUploadProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+
+            android:gravity="center_vertical"
+            android:text="0%"
+            android:textColor="#008EFF"
+            android:textSize="16sp"></TextView>
+    </RelativeLayout>
+</RelativeLayout>
+
+

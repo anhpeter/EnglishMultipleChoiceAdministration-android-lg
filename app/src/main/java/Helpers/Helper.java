@@ -27,8 +27,8 @@ public class Helper {
     }
 
     // TEMPLATE
-    public static void solveListMessage(boolean isListEmpty, ListView lv, TextView txtMessage, String message){
-        if (!isListEmpty) {
+    public static void solveListMessage(boolean isShowMessage, ListView lv, TextView txtMessage, String message){
+        if (!isShowMessage) {
             txtMessage.setText("");
             txtMessage.setVisibility(View.GONE);
             lv.setVisibility(View.VISIBLE);
@@ -74,7 +74,7 @@ public class Helper {
     public static boolean getBooleanByDataSnapshot(DataSnapshot snapshot, String key, boolean defaultValue){
         try{
             String booleanStr = snapshot.child(key).getValue().toString();
-            if (booleanStr == "true") return true;
+            if (booleanStr.equals("true")) return true;
             else return false;
         }catch(Exception e){
             return defaultValue;
@@ -111,6 +111,11 @@ public class Helper {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         return timestamp.getTime();
     }
+
+    public static int arrayIndexOf(String[] array, String value){
+        return java.util.Arrays.asList(array).indexOf(value);
+    }
+
 
 
 }

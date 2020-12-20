@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -67,8 +68,6 @@ public class MainActivity extends Activity implements FragmentCommunicate {
         indexTitleBarFragment = new IndexTitleBarFragment();
         fragmentTransaction.add(R.id.indexTitleBarFrame, indexTitleBarFragment, "titleBar");
         fragmentTransaction.commit();
-        Toast.makeText(this, "call fragments", Toast.LENGTH_SHORT).show();
-
         if (getController().equals("questions")) callQuestionFragments();
         else if (getController().equals("users")) callUserFragments();
     }
@@ -130,17 +129,17 @@ public class MainActivity extends Activity implements FragmentCommunicate {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        try{
-            //questionIndexFragment.onListAll();
-        }catch (Exception e){}
-    }
-
-    @Override
     public void onBackPressed() {
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
         } else super.onBackPressed();
     }
+
+    @Override
+    protected void doSomethingOnNetworkChange() {
+        if (internetConnectionAvailable()){
+            callFragments();
+        }
+    }
+
 }

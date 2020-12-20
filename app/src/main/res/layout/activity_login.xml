@@ -24,32 +24,65 @@
         android:id="@+id/edtUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/custom_edit_text_1"
+        android:textCursorDrawable="@drawable/blue_cursor"
 
         android:layout_below="@id/title"
         android:layout_marginTop="70dp"
-        android:hint="Username"
+        android:paddingLeft="10dp"
         ></EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/edtUsername"
+        android:text="Username"
+        android:background="#fff"
+        android:textColor="@color/blue"
+        android:paddingHorizontal="5dp"
+        android:gravity="center"
+        android:layout_alignLeft="@id/edtUsername"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="-10dp"
+        ></TextView>
 
     <EditText
         android:id="@+id/edtPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
+        android:background="@drawable/custom_edit_text_1"
+        android:textCursorDrawable="@drawable/blue_cursor"
         android:layout_below="@id/edtUsername"
         android:layout_marginTop="10dp"
         android:inputType="textPassword"
-        android:hint="Password"
+        android:paddingLeft="10dp"
         ></EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/edtPassword"
+        android:text="Password"
+        android:background="#fff"
+        android:textColor="@color/blue"
+        android:paddingHorizontal="5dp"
+        android:gravity="center"
+        android:layout_alignLeft="@id/edtPassword"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="-10dp"
+        ></TextView>
 
     <Button
         android:id="@+id/btnSubmit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
         android:text="Login"
-        android:background="@color/blue"
+        android:background="@drawable/save_button"
         android:textColor="#fff"
         android:layout_below="@id/edtPassword"
         android:layout_marginTop="30dp"
+        android:textAllCaps="false"
         android:layout_centerHorizontal="true"
 
         ></Button>

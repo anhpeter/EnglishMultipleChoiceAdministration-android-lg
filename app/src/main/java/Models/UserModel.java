@@ -37,7 +37,6 @@ public class UserModel extends Model{
         getCollectionRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("xxx", "list all called");
                 ArrayList<MyUser> userArrayList = new ArrayList<>();
                 for (DataSnapshot childSnapshot: snapshot.getChildren()) {
                     MyUser user = MyUser.getUserByDataSnapshot(childSnapshot);

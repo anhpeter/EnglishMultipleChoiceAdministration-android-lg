@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rltTextAnswer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/linearRadioGroupCorrectAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/linearEditText"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/radioGroupCorrectAnswer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:weightSum="4">
+
+            <RadioButton
+                android:id="@+id/radioA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@drawable/green_checkbox"
+                android:checked="true"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@drawable/green_checkbox"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioC"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@drawable/green_checkbox"></RadioButton>
+
+            <RadioButton
+                android:id="@+id/radioD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:button="@drawable/green_checkbox"></RadioButton>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/linearRadioGroupCorrectAnswer"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/edtAnswerA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_edit_text_3"
+            android:hint="Option 1"
+            android:paddingLeft="10dp"
+            android:textCursorDrawable="@drawable/green_cursor"></EditText>
+
+
+        <EditText
+            android:id="@+id/edtAnswerB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/custom_edit_text_3"
+            android:hint="Option 2"
+            android:paddingLeft="10dp"
+            android:textCursorDrawable="@drawable/green_cursor"></EditText>
+
+        <EditText
+            android:id="@+id/edtAnswerC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/custom_edit_text_3"
+            android:hint="Option 3"
+            android:paddingLeft="10dp"
+            android:textCursorDrawable="@drawable/green_cursor"></EditText>
+
+        <EditText
+            android:id="@+id/edtAnswerD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/custom_edit_text_3"
+            android:hint="Option 4"
+            android:paddingLeft="10dp"
+            android:textCursorDrawable="@drawable/green_cursor"></EditText>
+    </LinearLayout>
+
+</RelativeLayout>
