@@ -24,7 +24,13 @@ public class Question {
     private String answerD;
     private String questionType; // text | picture
     private String level; // hard | medium | easy
+
+    // type
     private boolean isImageQuestion;
+    private boolean isImageAnswer;
+    private boolean isVoiceQuestion;
+    private boolean isVoiceAnswer;
+    //
     private long created;
     private long lastInteracted;
     private boolean isSpeechQuestion;
@@ -264,6 +270,26 @@ public class Question {
 
     public void setSpeechQuestion(boolean speechQuestion) {
         isSpeechQuestion = speechQuestion;
+    }
+
+    public void setImageAnswer(boolean imageAnswer) {
+        isImageAnswer = imageAnswer;
+    }
+
+    public boolean isVoiceQuestion() {
+        return isVoiceQuestion;
+    }
+
+    public void setVoiceQuestion(boolean voiceQuestion) {
+        isVoiceQuestion = voiceQuestion;
+    }
+
+    public boolean isVoiceAnswer() {
+        return isVoiceAnswer;
+    }
+
+    public void setVoiceAnswer(boolean voiceAnswer) {
+        isVoiceAnswer = voiceAnswer;
     }
 
 }
