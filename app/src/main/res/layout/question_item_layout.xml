@@ -38,7 +38,7 @@
             ></TextView>
 
         <TextView
-            android:id="@+id/txtQuestionType"
+            android:id="@+id/txtAnswerType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 

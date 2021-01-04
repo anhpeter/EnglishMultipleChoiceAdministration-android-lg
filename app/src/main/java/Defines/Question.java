@@ -22,7 +22,6 @@ public class Question {
     private String answerB;
     private String answerC;
     private String answerD;
-    private String questionType; // text | picture
     private String level; // hard | medium | easy
 
     // type
@@ -33,10 +32,9 @@ public class Question {
     //
     private long created;
     private long lastInteracted;
-    private boolean isSpeechQuestion;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String questionType, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isSpeechQuestion) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isVoiceAnswer, boolean isImageAnswer) {
         this.setId(id);
         this.setQuestion(question);
         this.setAnswerA(answerA);
@@ -44,12 +42,12 @@ public class Question {
         this.setAnswerC(answerC);
         this.setAnswerD(answerD);
         this.setCorrectAnswer(correctAnswer);
-        this.setQuestionType(questionType);
         this.setLevel(level);
         this.setCreated(created);
         this.setLastInteracted(lastInteracted);
         this.setIsImageQuestion(isImageQuestion);
-        this.setSpeechQuestion(isSpeechQuestion);
+        this.setImageAnswer(isImageAnswer);
+        this.setVoiceAnswer(isVoiceAnswer);
     }
 
     public String getQuestion() {
@@ -100,14 +98,6 @@ public class Question {
         this.answerD = answerD;
     }
 
-    public String getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
-
     public String getLevel() {
         return level;
     }
@@ -148,16 +138,12 @@ public class Question {
             String answerD = dataSnapshot.child("D").getValue().toString();
             boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
             boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
-            boolean isSpeechQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsSpeechQuestion", false);
-            String questionType;
-            if (isSpeechQuestion) questionType = "speech";
-            else questionType = (isImageAnswer) ? "picture" : "text";
+            boolean isVoiceAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsVoiceAnswer", false);
             String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
             String level = getLevelByCategoryId(categoryId);
             long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
             long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, questionType, level, created, lastInteracted, isImageQuestion, isSpeechQuestion);
-            Log.d("xxx", qt.getInfo());
+            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isVoiceAnswer,isImageAnswer);
             return qt;
         } else return null;
     }
@@ -176,17 +162,9 @@ public class Question {
         docData.put("LastInteracted", getLastInteracted() + "");
         docData.put("IsImageQuestion", getIsImageQuestion() + "");
         docData.put("IsImageAnswer", getIsImageAnswer() + "");
-        docData.put("IsSpeechQuestion", isSpeechQuestion() + "");
+        docData.put("IsVoiceAnswer", isVoiceAnswer() + "");
+        showInfo();
         return docData;
-    }
-
-    public boolean getIsImageAnswer() {
-        return (getQuestionType().equals("picture")) ? true : false;
-    }
-
-    public String getInfo() {
-        return getId() + ";" + getQuestion() + ";" + getQuestionType() + ";" + getLevel() + ";" + getCorrectAnswer() + ";" + getAnswerA()
-                + ";" + getAnswerB() + ";" + getAnswerC() + ";" + getAnswerD() + ";" + getCreated();
     }
 
     public String getCorrectAnswerInLetter() {
@@ -264,20 +242,13 @@ public class Question {
 
     }
 
-    public boolean isSpeechQuestion() {
-        return isSpeechQuestion;
-    }
-
-    public void setSpeechQuestion(boolean speechQuestion) {
-        isSpeechQuestion = speechQuestion;
-    }
 
     public void setImageAnswer(boolean imageAnswer) {
         isImageAnswer = imageAnswer;
     }
 
     public boolean isVoiceQuestion() {
-        return isVoiceQuestion;
+        return isVoiceQuestion || false;
     }
 
     public void setVoiceQuestion(boolean voiceQuestion) {
@@ -285,11 +256,32 @@ public class Question {
     }
 
     public boolean isVoiceAnswer() {
-        return isVoiceAnswer;
+        return isVoiceAnswer || false;
+    }
+
+    public boolean getIsImageAnswer() {
+        return isImageAnswer || false;
     }
 
     public void setVoiceAnswer(boolean voiceAnswer) {
         isVoiceAnswer = voiceAnswer;
+    }
+
+    public String getAnswerType() {
+        String result;
+        if (getIsImageAnswer()) result = "picture";
+        else if (isVoiceAnswer()) result = "voice";
+        else result = "text";
+        return result;
+    }
+
+    public void setAnswerType(String value) {
+        if (value.equals("voice")) setVoiceAnswer(true);
+        else if (value.equals("picture")) setImageAnswer(true);
+    }
+
+    public void showInfo(){
+        Log.d("ppp", "image answer:"+getIsImageAnswer()+";voice answer:"+isVoiceAnswer()+";answer type:"+getAnswerType());
     }
 
 }

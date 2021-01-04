@@ -46,7 +46,7 @@ public class QuestionAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        TextView txtQuestion, txtQuestionType, txtThumb;
+        TextView txtQuestion, txtAnswerType, txtThumb;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class QuestionAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(layout, null);
 
             holder.txtQuestion  = (TextView) convertView.findViewById(R.id.txtQuestion);
-            holder.txtQuestionType  = (TextView) convertView.findViewById(R.id.txtQuestionType);
+            holder.txtAnswerType  = (TextView) convertView.findViewById(R.id.txtAnswerType);
             holder.txtThumb  = (TextView) convertView.findViewById(R.id.txtThumb);
             convertView.setTag(holder);
         }else{
@@ -67,13 +67,11 @@ public class QuestionAdapter extends BaseAdapter {
 
         Question question = questionArrayList.get(position);
         holder.txtQuestion.setText(question.getQuestion());
-        holder.txtQuestionType.setText("Type: "+question.getQuestionType());
+        holder.txtAnswerType.setText("Type: "+question.getAnswerType());
         String thumbText = (question.getIsImageQuestion()) ? "P" : Helper.getUppercaseFirstCharacter(question.getQuestion());
         holder.txtThumb.setText(thumbText);
         Animation animScale = AnimationUtils.loadAnimation(context, R.anim.anim_scale_for_listview_item);
         convertView.startAnimation(animScale);
         return convertView;
     }
-
-
 }
