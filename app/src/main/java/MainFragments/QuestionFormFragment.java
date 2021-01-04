@@ -557,8 +557,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         this.item = item;
         edtQuestion.setText(item.getQuestion());
         ((RadioButton) radioGroupAnswerType.getChildAt(getTypePos(item.getAnswerType()))).setChecked(true);
-        Log.d("ppp", item.getAnswerType()+"; "+item.getIsImageAnswer()+"; "+item.isVoiceAnswer());
-        if (item.isVoiceAnswer()) {
+        if (item.getIsVoiceAnswer()) {
             setVoiceAnswerView();
             solveVisibility("voice");
         } else if (item.getIsImageAnswer()) {

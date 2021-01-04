@@ -162,7 +162,7 @@ public class Question {
         docData.put("LastInteracted", getLastInteracted() + "");
         docData.put("IsImageQuestion", getIsImageQuestion() + "");
         docData.put("IsImageAnswer", getIsImageAnswer() + "");
-        docData.put("IsVoiceAnswer", isVoiceAnswer() + "");
+        docData.put("IsVoiceAnswer", getIsVoiceAnswer() + "");
         showInfo();
         return docData;
     }
@@ -255,7 +255,7 @@ public class Question {
         isVoiceQuestion = voiceQuestion;
     }
 
-    public boolean isVoiceAnswer() {
+    public boolean getIsVoiceAnswer() {
         return isVoiceAnswer || false;
     }
 
@@ -270,7 +270,7 @@ public class Question {
     public String getAnswerType() {
         String result;
         if (getIsImageAnswer()) result = "picture";
-        else if (isVoiceAnswer()) result = "voice";
+        else if (getIsVoiceAnswer()) result = "voice";
         else result = "text";
         return result;
     }
@@ -281,7 +281,7 @@ public class Question {
     }
 
     public void showInfo(){
-        Log.d("ppp", "image answer:"+getIsImageAnswer()+";voice answer:"+isVoiceAnswer()+";answer type:"+getAnswerType());
+        Log.d("ppp", "image answer:"+getIsImageAnswer()+";voice answer:"+getIsVoiceAnswer()+";answer type:"+getAnswerType());
     }
 
 }
