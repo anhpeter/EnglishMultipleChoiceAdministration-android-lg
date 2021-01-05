@@ -50,30 +50,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/edtQuestion"
         android:layout_marginTop="20dp"></include>
-    <!--
-    <TextView
-        android:id="@+id/txtLevel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
 
-        android:layout_below="@id/txtQuestionType"
-        android:layout_marginTop="20dp"
-        android:text="Level."
 
-        android:textSize="16sp"></TextView>
-
-    <Spinner
-        android:id="@+id/spinnerLevel"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-
-        android:layout_alignBaseline="@id/txtLevel"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="20dp"
-
-        ></Spinner>
-
-    -->
 
     <!-- ANSWER -->
     <RelativeLayout

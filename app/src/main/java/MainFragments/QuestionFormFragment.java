@@ -1,20 +1,25 @@
 package MainFragments;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,6 +47,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Defines.AddQuestionDialogViewHolder;
 import Defines.FragmentCommunicate;
 import Defines.ICallback;
 import Defines.IMyStorage;
@@ -64,10 +70,9 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     HashMap<String, String> params;
 
     // WIDGET
-    Spinner spinnerLevel;
     RadioGroup radioGroupAnswerType, radioGroupCorrectAnswer;
     EditText edtQuestion, edtAnswerA, edtAnswerB, edtAnswerC, edtAnswerD;
-    TextView txtUploadProgress, txtQuestionLabel;
+    TextView txtUploadProgress, txtQuestionLabel, txtQuestionIcon;
     RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
     ImageView pictureA, pictureB, pictureC, pictureD;
     RelativeLayout rltTextAnswer, rltPictureAnswer, rltUploadProgress;
@@ -103,6 +108,12 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
         mapping();
         onInit();
+        txtQuestionIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddQuestionDialog();
+            }
+        });
         return v;
     }
 
@@ -115,7 +126,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         pictures = new ImageView[]{pictureA, pictureB, pictureC, pictureD};
         radioPictureA.setChecked(true);
         setArguments();
-        //initLevelSpinner();
         onPictureRadiosChecked();
         onPictureClicked();
         onAnswerTypeRadiosChecked();
@@ -179,7 +189,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                     case R.id.radioButtonPicture:
                         answerType = "picture";
                         break;
-                    case R.id.radioButtonAnswerVoice:
+                    case R.id.radioButtonVoice:
                         answerType = "voice";
                         break;
                 }
@@ -206,24 +216,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         } else {
             txtQuestionLabel.setText("Question");
         }
-    }
-
-    private void initLevelSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, levelValues);
-        adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
-        spinnerLevel.setAdapter(adapter);
-
-        // easy is default
-        spinnerLevel.setSelection(getLevelPos(getCalledActivity().getQuestionLevel()));
-        spinnerLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
     }
 
     // ON SUBMIT
@@ -348,11 +340,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     private String getQuestionLevelValue() {
         String result = getCalledActivity().getQuestionLevel();
-        /*
-        int pos = spinnerLevel.getSelectedItemPosition();
-        result = levelValues[pos];
-
-         */
         return result;
     }
 
@@ -393,7 +380,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             case R.id.radioButtonPicture:
                 result = "picture";
                 break;
-            case R.id.radioButtonAnswerVoice:
+            case R.id.radioButtonVoice:
                 result = "voice";
                 break;
         }
@@ -432,8 +419,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     // MAPPING
     private void mapping() {
-        //spinnerLevel = (Spinner) v.findViewById(R.id.spinnerLevel);
-        radioGroupAnswerType = (RadioGroup) v.findViewById(R.id.radioGroupAnswerType);
+        radioGroupAnswerType = (RadioGroup) v.findViewById(R.id.radioGroupType);
         radioGroupCorrectAnswer = (RadioGroup) v.findViewById(R.id.radioGroupCorrectAnswer);
         edtQuestion = (EditText) v.findViewById(R.id.edtQuestion);
         edtAnswerA = (EditText) v.findViewById(R.id.edtAnswerA);
@@ -443,6 +429,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         btnSubmit = (Button) v.findViewById(R.id.btnSubmit);
         txtUploadProgress = (TextView) v.findViewById(R.id.txtUploadProgress);
         txtQuestionLabel = (TextView) v.findViewById(R.id.txtQuestionLabel);
+        txtQuestionIcon = (TextView)  v.findViewById(R.id.txtQuestion);
 
 
         radioPictureA = (RadioButton) v.findViewById(R.id.radioPictureA);
@@ -685,5 +672,44 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         totalUpload = 0;
         progressArr = new double[]{0, 0, 0, 0};
         progress = 0;
+    }
+
+    // ADD QUESTION DIALOG
+    private void showAddQuestionDialog() {
+        Dialog dialog = new Dialog(getCalledActivity());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.add_question_dialog_layout);
+        dialog.setCanceledOnTouchOutside(true);
+        // Setting dialogview
+        Window window = dialog.getWindow();
+        window.setGravity(Gravity.BOTTOM);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        // set width
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        dialog.getWindow().setAttributes(lp);
+
+        // holder
+        AddQuestionDialogViewHolder holder = new AddQuestionDialogViewHolder();
+
+        // mapping...
+        mappingAddQuestionDialog(holder, dialog);
+
+        // set..
+        holder.radioVoice.setText("Audio");
+
+        // events...
+
+        //dialog.dismiss();
+        dialog.show();
+    }
+
+    private void mappingAddQuestionDialog(AddQuestionDialogViewHolder holder, Dialog dialog) {
+        holder.radioGroupQuestionType = (RadioGroup) dialog.findViewById(R.id.radioGroupType);
+        holder.radioText = (RadioButton) dialog.findViewById(R.id.radioButtonText);
+        holder.radioPicture = (RadioButton) dialog.findViewById(R.id.radioButtonPicture);
+        holder.radioVoice = (RadioButton) dialog.findViewById(R.id.radioButtonVoice);
     }
 }

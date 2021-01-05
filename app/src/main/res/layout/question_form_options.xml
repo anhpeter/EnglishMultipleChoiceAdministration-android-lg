@@ -4,7 +4,7 @@
     android:layout_height="wrap_content">
 
     <RadioGroup
-        android:id="@+id/radioGroupAnswerType"
+        android:id="@+id/radioGroupType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -30,7 +30,7 @@
             android:text="Picture"></RadioButton>
 
         <RadioButton
-            android:id="@+id/radioButtonAnswerVoice"
+            android:id="@+id/radioButtonVoice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"

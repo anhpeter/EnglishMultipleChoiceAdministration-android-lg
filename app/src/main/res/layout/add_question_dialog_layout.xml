@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:padding="20dp">
+
+    <include layout="@layout/question_form_options"  android:visibility="gone"/>
+    <LinearLayout
+        android:id="@+id/linearQuestionType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <Button
+            android:id="@+id/btnText"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light"
+            android:text="Text"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:paddingLeft="20dp"
+            ></Button>
+        <Button
+            android:id="@+id/btnPicture"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light"
+            android:text="Picture"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:paddingLeft="20dp"
+            ></Button>
+        <Button
+            android:id="@+id/btnAudio"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light"
+            android:text="Audio"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:paddingLeft="20dp"
+            ></Button>
+        <Button
+            android:id="@+id/btnCancel"
+            android:textAllCaps="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/light"
+            android:text="Cancel"
+            android:textSize="23sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            ></Button>
+    </LinearLayout>
+
+</RelativeLayout>
