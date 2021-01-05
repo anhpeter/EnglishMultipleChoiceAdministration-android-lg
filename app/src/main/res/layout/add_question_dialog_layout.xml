@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" android:padding="20dp">
 
-    <include layout="@layout/question_form_options"  android:visibility="gone"/>
     <LinearLayout
         android:id="@+id/linearQuestionType"
         android:layout_width="match_parent"
