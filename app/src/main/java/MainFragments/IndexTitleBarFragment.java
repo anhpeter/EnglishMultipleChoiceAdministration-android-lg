@@ -106,7 +106,7 @@ public class IndexTitleBarFragment extends MyFragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 setQuestionLevel(position);
-                fragmentCommunicate.communicate(null, fragmentName);
+                fragmentCommunicate.communicate((HashMap<String, String>) null, fragmentName);
             }
 
             @Override
@@ -155,7 +155,7 @@ public class IndexTitleBarFragment extends MyFragment {
             getCalledActivity().setIsChangingController(true);
             getCalledActivity().setController(value);
             solveQuestionLevelSpinnerVisibility();
-            fragmentCommunicate.communicate(null, fragmentName);
+            fragmentCommunicate.communicate((HashMap<String, String>) null, fragmentName);
         }
     }
 

@@ -27,14 +27,14 @@ public class Question {
     // type
     private boolean isImageQuestion;
     private boolean isImageAnswer;
-    private boolean isVoiceQuestion;
+    private boolean isAudioQuestion;
     private boolean isVoiceAnswer;
     //
     private long created;
     private long lastInteracted;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isVoiceAnswer, boolean isImageAnswer) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isAudioQuestion, boolean isVoiceAnswer, boolean isImageAnswer) {
         this.setId(id);
         this.setQuestion(question);
         this.setAnswerA(answerA);
@@ -139,11 +139,12 @@ public class Question {
             boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
             boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
             boolean isVoiceAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsVoiceAnswer", false);
+            boolean isAudioQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsAudioQuestion", false);
             String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
             String level = getLevelByCategoryId(categoryId);
             long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
             long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isVoiceAnswer,isImageAnswer);
+            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer,isImageAnswer);
             return qt;
         } else return null;
     }
@@ -161,6 +162,7 @@ public class Question {
         docData.put("Created", getCreated() + "");
         docData.put("LastInteracted", getLastInteracted() + "");
         docData.put("IsImageQuestion", getIsImageQuestion() + "");
+        docData.put("IsAudioQuestion", getIsAudioQuestion() + "");
         docData.put("IsImageAnswer", getIsImageAnswer() + "");
         docData.put("IsVoiceAnswer", getIsVoiceAnswer() + "");
         showInfo();
@@ -247,12 +249,12 @@ public class Question {
         isImageAnswer = imageAnswer;
     }
 
-    public boolean isVoiceQuestion() {
-        return isVoiceQuestion || false;
+    public boolean getIsAudioQuestion() {
+        return isAudioQuestion || false;
     }
 
-    public void setVoiceQuestion(boolean voiceQuestion) {
-        isVoiceQuestion = voiceQuestion;
+    public void setIsAudioQuestion(boolean value) {
+        isAudioQuestion = value;
     }
 
     public boolean getIsVoiceAnswer() {
@@ -275,8 +277,21 @@ public class Question {
         return result;
     }
 
+    public String getQuestionType() {
+        String result;
+        if (getIsImageQuestion()) result = "picture";
+        else if (getIsAudioQuestion()) result = "audio";
+        else result = "text";
+        return result;
+    }
+
     public void setAnswerType(String value) {
         if (value.equals("voice")) setVoiceAnswer(true);
+        else if (value.equals("picture")) setImageAnswer(true);
+    }
+
+    public void setQuestionType(String value) {
+        if (value.equals("audio")) setIsAudioQuestion(true);
         else if (value.equals("picture")) setImageAnswer(true);
     }
 

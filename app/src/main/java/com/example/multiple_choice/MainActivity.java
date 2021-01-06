@@ -99,6 +99,11 @@ public class MainActivity extends Activity implements FragmentCommunicate {
         }
     }
 
+    @Override
+    public void communicate(String event, String fromFragment) {
+
+    }
+
     private void indexTitleBarFragmentCommunicate(HashMap<String, String> params) {
         if (getController().equals("questions")) {
             if (getIsChangingController()){

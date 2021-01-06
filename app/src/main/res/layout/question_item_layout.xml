@@ -42,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
-            android:text="Type: picture"
+            android:text="Type: image"
             android:textSize="14sp"
             android:textColor="@color/blue"
             android:layout_below="@+id/txtQuestion"

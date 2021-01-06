@@ -27,8 +27,8 @@
             android:layout_toRightOf="@id/radioPictureA"
             android:layout_weight="7"
             android:background="@drawable/quize_light"
-            android:scaleType="fitCenter"
             android:padding="5dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/add_picture"></ImageView>
 
         <View
@@ -51,8 +51,8 @@
             android:layout_toRightOf="@id/radioPictureA"
             android:layout_weight="7"
             android:background="@drawable/quize_light"
-            android:scaleType="fitCenter"
             android:padding="5dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/add_picture"></ImageView>
     </LinearLayout>
 
@@ -80,8 +80,8 @@
             android:layout_toRightOf="@id/radioPictureA"
             android:layout_weight="7"
             android:background="@drawable/quize_light"
-            android:scaleType="fitCenter"
             android:padding="5dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/add_picture"></ImageView>
 
         <View
@@ -104,8 +104,8 @@
             android:layout_toRightOf="@id/radioPictureA"
             android:layout_weight="7"
             android:background="@drawable/quize_light"
-            android:scaleType="fitCenter"
             android:padding="5dp"
+            android:scaleType="fitCenter"
             android:src="@drawable/add_picture"></ImageView>
     </LinearLayout>
 

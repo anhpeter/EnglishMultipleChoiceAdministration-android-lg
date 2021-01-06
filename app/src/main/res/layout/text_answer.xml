@@ -63,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_edit_text_3"
-            android:hint="Option 1"
+            android:hint="Option"
             android:paddingLeft="10dp"
             android:textCursorDrawable="@drawable/green_cursor"></EditText>
 
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:background="@drawable/custom_edit_text_3"
-            android:hint="Option 2"
+            android:hint="Option"
             android:paddingLeft="10dp"
             android:textCursorDrawable="@drawable/green_cursor"></EditText>
 
@@ -84,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:background="@drawable/custom_edit_text_3"
-            android:hint="Option 3"
+            android:hint="Option"
             android:paddingLeft="10dp"
             android:textCursorDrawable="@drawable/green_cursor"></EditText>
 
@@ -94,7 +94,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:background="@drawable/custom_edit_text_3"
-            android:hint="Option 4"
+            android:hint="Option"
             android:paddingLeft="10dp"
             android:textCursorDrawable="@drawable/green_cursor"></EditText>
     </LinearLayout>

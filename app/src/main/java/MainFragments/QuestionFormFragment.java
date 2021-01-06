@@ -1,6 +1,7 @@
 package MainFragments;
 
 import android.Manifest;
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,10 +10,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -27,6 +31,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.example.multiple_choice.Activity;
+import com.example.multiple_choice.FormActivity;
 import com.example.multiple_choice.R;
 import com.squareup.picasso.Picasso;
 
@@ -39,7 +45,9 @@ import Defines.FragmentCommunicate;
 import Defines.ICallback;
 import Defines.IMyStorage;
 import Defines.Question;
+import Defines.QuestionFormData;
 import Helpers.Helper;
+import Helpers.MyStorage;
 import Helpers.QuestionPictureManager;
 import Models.QuestionModel;
 
@@ -58,7 +66,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     // WIDGET
     RadioGroup radioGroupAnswerType, radioGroupCorrectAnswer;
     EditText edtAnswerA, edtAnswerB, edtAnswerC, edtAnswerD;
-    TextView txtUploadProgress, txtQuestionIcon, txtQuestion;
+    TextView txtUploadProgress, txtQuestion;
     RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
     ImageView pictureA, pictureB, pictureC, pictureD;
     RelativeLayout rltSec, rltTextAnswer, rltPictureAnswer, rltUploadProgress;
@@ -69,7 +77,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     String levelValues[] = {"hard", "medium", "easy"};
     String typeValues[] = {"text", "picture", "voice"};
     String correctAnswerValues[] = {"A", "B", "C", "D"};
-    String picturePaths[] = {"", "", "", ""};
+    String imagePaths[] = {"", "", "", ""};
 
     // WIDGET ARRAYS
     RadioButton radioPictures[];
@@ -98,22 +106,21 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     private void onInit() {
-        setDefaultPictureQuestionParams();
-        //Helper.clearEditTextFocus(edtQuestion);
+        setDefaultPictureAnswerParams();
         questionModel = new QuestionModel(getActivity(), this);
         fragmentCommunicate = (FragmentCommunicate) getActivity();
         radioPictures = new RadioButton[]{radioPictureA, radioPictureB, radioPictureC, radioPictureD};
         pictures = new ImageView[]{pictureA, pictureB, pictureC, pictureD};
         radioPictureA.setChecked(true);
         setArguments();
+        onTxtQuestionClick();
         onPictureRadiosChecked();
         onPictureClicked();
         onAnswerTypeRadiosChecked();
         onSubmitClick();
-        onQuestionClick();
     }
 
-    private void onQuestionClick(){
+    private void onTxtQuestionClick() {
         txtQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -214,13 +221,30 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                     } else if (answerTypeSelected == "voice") {
                         onSaveTextAnswer();
                     } else if (answerTypeSelected == "picture") {
-                        onSaveImageAnswer();
+                        onSavePictureAnswer();
                     }
                 } else {
                     showInValidMessage();
                 }
             }
         });
+    }
+
+    private String getAnswerTypeSelected() {
+        String result = "";
+        int typeRadioButtonId = radioGroupAnswerType.getCheckedRadioButtonId();
+        switch (typeRadioButtonId) {
+            case R.id.radioButtonText:
+                result = "text";
+                break;
+            case R.id.radioButtonPicture:
+                result = "picture";
+                break;
+            case R.id.radioButtonVoice:
+                result = "voice";
+                break;
+        }
+        return result;
     }
 
     private boolean isFormValid() {
@@ -264,20 +288,20 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         } else if (formType.equals("add")) {
             Question questionObj = new Question(null, saveParams.get("question"), null,
                     answerA, answerB, answerC, answerD, saveParams.get("level"),
-                    Helper.getTime(), Helper.getTime(), false, isVoiceAnswer, false);
+                    Helper.getTime(), Helper.getTime(), QuestionFormData.isImageQuestion(), QuestionFormData.isAudioQuestion(), isVoiceAnswer, false);
             questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
             solveAdd(questionObj);
         }
     }
 
-    private void onSaveImageAnswer() {
-        if (isPictureQuestionOptionValid() && questionPictureManager.isAnswerUriValid()) {
+    private void onSavePictureAnswer() {
+        if (isPictureAnswerOptionValid() && questionPictureManager.isAnswerUriValid()) {
             totalUpload = questionPictureManager.getTotalUpload();
             if (totalUpload > 0) {
                 rltUploadProgress.setVisibility(View.VISIBLE);
                 questionPictureManager.upload(QuestionFormFragment.this);
             } else {
-                saveImageAnswer();
+                savePictureAnswer();
             }
         } else {
             showInValidMessage();
@@ -302,7 +326,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private boolean isTextQuestionOptionValid(String answerA, String answerB, String answerC, String answerD) {
         String answerArr[] = {answerA, answerB, answerC, answerD};
         if (
-                isPictureQuestionOptionValid() &&
+                isPictureAnswerOptionValid() &&
                         !answerA.trim().isEmpty() &&
                         !answerB.trim().isEmpty() &&
                         !answerC.trim().isEmpty() &&
@@ -311,7 +335,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         return false;
     }
 
-    private boolean isPictureQuestionOptionValid() {
+    private boolean isPictureAnswerOptionValid() {
         HashMap<String, String> saveParams = getSaveParams();
         if (
                 !saveParams.get("question").isEmpty() &&
@@ -350,23 +374,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             else if (radioPictureB.isChecked()) result = "B";
             else if (radioPictureC.isChecked()) result = "C";
             else if (radioPictureD.isChecked()) result = "D";
-        }
-        return result;
-    }
-
-    private String getAnswerTypeSelected() {
-        String result = "";
-        int typeRadioButtonId = radioGroupAnswerType.getCheckedRadioButtonId();
-        switch (typeRadioButtonId) {
-            case R.id.radioButtonText:
-                result = "text";
-                break;
-            case R.id.radioButtonPicture:
-                result = "picture";
-                break;
-            case R.id.radioButtonVoice:
-                result = "voice";
-                break;
         }
         return result;
     }
@@ -412,7 +419,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         edtAnswerD = (EditText) v.findViewById(R.id.edtAnswerD);
         btnSubmit = (Button) v.findViewById(R.id.btnSubmit);
         txtUploadProgress = (TextView) v.findViewById(R.id.txtUploadProgress);
-        txtQuestionIcon = (TextView)  v.findViewById(R.id.txtQuestion);
 
 
         radioPictureA = (RadioButton) v.findViewById(R.id.radioPictureA);
@@ -426,7 +432,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         pictureD = (ImageView) v.findViewById(R.id.pictureD);
 
         rltTextAnswer = (RelativeLayout) v.findViewById(R.id.rltTextAnswer);
-        rltSec = (RelativeLayout)  v.findViewById(R.id.rltSec);
+        rltSec = (RelativeLayout) v.findViewById(R.id.rltSec);
         rltPictureAnswer = (RelativeLayout) v.findViewById(R.id.rltPictureAnswer);
         rltUploadProgress = (RelativeLayout) v.findViewById(R.id.rltProgressUpload);
         progressUpload = (ProgressBar) v.findViewById(R.id.progressUpload);
@@ -479,14 +485,13 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             new android.os.Handler().postDelayed(
                     new Runnable() {
                         public void run() {
-                            saveImageAnswer();
+                            savePictureAnswer();
                         }
                     }, 500);
         }
     }
 
-    public void saveImageAnswer() {
-        Log.d("xxx", "on save");
+    public void savePictureAnswer() {
         HashMap<String, String> saveParams = getSaveParams();
         if (formType.equals("edit")) {
             item.setQuestion(saveParams.get("question"));
@@ -504,7 +509,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswerInLetter"),
                     questionPictureManager.getAnswerAPath(),
                     questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
-                    saveParams.get("level"), Helper.getTime(), Helper.getTime(), false, false, true);
+                    saveParams.get("level"), Helper.getTime(), Helper.getTime(), QuestionFormData.isImageQuestion(), QuestionFormData.isAudioQuestion(), false, true);
             questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
             solveAdd(questionObj);
         }
@@ -526,16 +531,17 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     private void onGetEditItemCallBack(Question item) {
         this.item = item;
+        QuestionFormData.setQuestion(item);
         txtQuestion.setText(item.getQuestion());
         ((RadioButton) radioGroupAnswerType.getChildAt(getTypePos(item.getAnswerType()))).setChecked(true);
         if (item.getIsVoiceAnswer()) {
             setVoiceAnswerView();
             solveVisibility("voice");
         } else if (item.getIsImageAnswer()) {
-            setPictureQuestionView();
+            setPictureAnswerView();
             solveVisibility("picture");
         } else {
-            setTextQuestionView();
+            setTextAnswerView();
             solveVisibility("text");
         }
         initQuestionPictureManager();
@@ -545,7 +551,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private void setVoiceAnswerView() {
     }
 
-    private void setTextQuestionView() {
+    private void setTextAnswerView() {
         txtQuestion.setText(item.getQuestion());
         edtAnswerA.setText(item.getAnswerA());
         edtAnswerB.setText(item.getAnswerB());
@@ -554,7 +560,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         ((RadioButton) radioGroupCorrectAnswer.getChildAt(getCorrectAnswerPos(item.getCorrectAnswer()))).setChecked(true);
     }
 
-    private void setPictureQuestionView() {
+    private void setPictureAnswerView() {
         Picasso.get().load(item.getAnswerA()).into(pictureA);
         Picasso.get().load(item.getAnswerB()).into(pictureB);
         Picasso.get().load(item.getAnswerC()).into(pictureC);
@@ -616,23 +622,24 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         saveParams.put("answerType", answerType);
         saveParams.put("correctAnswerInLetter", correctAnswer);
         return saveParams;
+
     }
 
     public void resetLayoutAndParams(String type) {
         // if current type is text => clear picture answer, if current type is picture => clear text answer
-        if (type.equals("text")) {
+        if (type.equals("picture")) {
+            edtAnswerA.setText("");
+            edtAnswerB.setText("");
+            edtAnswerC.setText("");
+            edtAnswerD.setText("");
+        } else {
             pictureA.setImageResource(R.drawable.add_picture);
             pictureB.setImageResource(R.drawable.add_picture);
             pictureC.setImageResource(R.drawable.add_picture);
             pictureD.setImageResource(R.drawable.add_picture);
             rltUploadProgress.setVisibility(View.GONE);
-        } else {
-            edtAnswerA.setText("");
-            edtAnswerB.setText("");
-            edtAnswerC.setText("");
-            edtAnswerD.setText("");
         }
-        setDefaultPictureQuestionParams();
+        setDefaultPictureAnswerParams();
     }
 
     public void resetAll() {
@@ -652,16 +659,32 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
     }
 
-    public void setDefaultPictureQuestionParams() {
+    public void setDefaultPictureAnswerParams() {
         totalUpload = 0;
         progressArr = new double[]{0, 0, 0, 0};
         progress = 0;
     }
 
-    // SHOW ADD QUESTION DIALOG
-    private void showAddQuestionDialog(){
-        AddQuestionDialogFragment dialogFragment = new AddQuestionDialogFragment();
-        dialogFragment.show(getFragmentManager(), "add-question-dialog");
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        QuestionFormData.reset();
+    }
+
+    public void onAddQuestionDialogDismiss() {
+        Toast.makeText(getCalledActivity(), "add question dismiss", Toast.LENGTH_SHORT).show();
+        switch (QuestionFormData.getQuestionType()) {
+            case "text":
+                txtQuestion.setText(QuestionFormData.getQuestionText());
+                break;
+            case "picture":
+            case "audio":
+        }
+    }
+
+    private void showAddQuestionDialog() {
+        AddQuestionDialogFragment dialog = new AddQuestionDialogFragment();
+        dialog.show(getFragmentManager(), "add-question-dialog");
     }
 
 }

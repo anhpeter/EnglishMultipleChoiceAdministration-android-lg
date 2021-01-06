@@ -3,6 +3,7 @@ package Helpers;
 import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
+import android.util.Log;
 
 public class QuestionPictureManager {
     private String questionPath;

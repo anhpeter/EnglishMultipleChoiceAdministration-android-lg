@@ -15,12 +15,13 @@ import Defines.FragmentCommunicate;
 import Defines.ICallback;
 import Defines.Question;
 import Helpers.Helper;
+import MainFragments.AddQuestionDialogFragment;
 import MainFragments.IndexTitleBarFragment;
 import MainFragments.QuestionFormFragment;
 import MainFragments.QuestionFormTitleBarFragment;
 import MainFragments.QuestionIndexFragment;
 
-public class FormActivity extends Activity implements FragmentCommunicate{
+public class FormActivity extends Activity implements FragmentCommunicate {
 
     FragmentManager fragmentManager;
     HashMap<String, String> myParams;
@@ -34,17 +35,17 @@ public class FormActivity extends Activity implements FragmentCommunicate{
         myParams = new HashMap<>();
         fragmentManager = getFragmentManager();
         Bundle b = getIntent().getBundleExtra("package");
-        if(b != null){
+        if (b != null) {
             // form params
             HashMap<String, String> params = (HashMap<String, String>) b.getSerializable("params");
             myParams = new HashMap<>();
             myParams.putAll(params);
             callFragments();
-        }else solveInputError();
+        } else solveInputError();
 
     }
 
-    private void solveInputError(){
+    private void solveInputError() {
         finish();
     }
 
@@ -75,16 +76,25 @@ public class FormActivity extends Activity implements FragmentCommunicate{
 
     @Override
     public void communicate(HashMap<String, String> data, String fromFragment) {
-        if (fromFragment.equals("question-form-title-bar")){
+        if (fromFragment.equals("question-form-title-bar")) {
             String delete = (data.get("delete") != null) ? data.get("delete") : "";
             if (delete.equals("yes")) questionFormFragment.onDelete();
         }
     }
 
     @Override
+    public void communicate(String event, String fromFragment) {
+        if (fromFragment.equals(AddQuestionDialogFragment.fragmentName)) {
+            if (event.equals("dismiss")) {
+               questionFormFragment.onAddQuestionDialogDismiss();
+            }
+        }
+    }
+
+    @Override
     public void onBackPressed() {
-        if (fragmentManager.getBackStackEntryCount() > 0){
+        if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
-        }else super.onBackPressed();
+        } else super.onBackPressed();
     }
 }
