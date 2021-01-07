@@ -628,7 +628,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             case "picture":
                 setPictureQuestionView();
                 break;
-            case "voice":
+            case "audio":
                 setAudioQuestionView();
                 break;
         }
@@ -650,6 +650,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     // SET ANSWER VIEW
     private void setAudioQuestionView() {
+        txtQuestion.setText(item.getQuestion());
     }
 
     private void setPictureQuestionView() {
