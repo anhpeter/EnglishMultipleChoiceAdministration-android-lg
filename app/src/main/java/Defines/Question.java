@@ -129,24 +129,31 @@ public class Question {
     // CREATE QUESTION BY FIREBASE DATA SNAPSHOT
     public static Question getQuestionByDataSnapshot(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
-            String id = dataSnapshot.getKey();
-            String question = dataSnapshot.child("Question").getValue().toString();
-            String correctAnswer = dataSnapshot.child("CorrectAnswer").getValue().toString();
-            String answerA = dataSnapshot.child("A").getValue().toString();
-            String answerB = dataSnapshot.child("B").getValue().toString();
-            String answerC = dataSnapshot.child("C").getValue().toString();
-            String answerD = dataSnapshot.child("D").getValue().toString();
-            boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
-            boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
-            boolean isVoiceAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsVoiceAnswer", false);
-            boolean isAudioQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsAudioQuestion", false);
-            String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
-            String level = getLevelByCategoryId(categoryId);
-            long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
-            long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-            Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer,isImageAnswer);
-            return qt;
-        } else return null;
+            try{
+
+                String id = dataSnapshot.getKey();
+                String question = dataSnapshot.child("Question").getValue().toString();
+                String correctAnswer = dataSnapshot.child("CorrectAnswer").getValue().toString();
+                String answerA = dataSnapshot.child("A").getValue().toString();
+                String answerB = dataSnapshot.child("B").getValue().toString();
+                String answerC = dataSnapshot.child("C").getValue().toString();
+                String answerD = dataSnapshot.child("D").getValue().toString();
+                boolean isImageAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageAnswer", false);
+                boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
+                boolean isVoiceAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsVoiceAnswer", false);
+                boolean isAudioQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsAudioQuestion", false);
+                String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
+                String level = getLevelByCategoryId(categoryId);
+                long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
+                long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
+                Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer, isImageAnswer);
+                return qt;
+            }catch (Exception e){
+                String id = dataSnapshot.getKey();
+                Log.d("xxx", "doc err: "+id);
+            }
+        }
+        return null;
     }
 
     // GET DOC FOR SAVING
@@ -286,17 +293,26 @@ public class Question {
     }
 
     public void setAnswerType(String value) {
-        if (value.equals("voice")) setVoiceAnswer(true);
-        else if (value.equals("picture")) setImageAnswer(true);
+        setVoiceAnswer(value.equals("voice"));
+        setImageAnswer(value.equals("picture"));
     }
 
     public void setQuestionType(String value) {
-        if (value.equals("audio")) setIsAudioQuestion(true);
-        else if (value.equals("picture")) setImageAnswer(true);
+        setIsAudioQuestion(value.equals("audio"));
+        setIsImageQuestion(value.equals("picture"));
     }
 
-    public void showInfo(){
-        Log.d("ppp", "image answer:"+getIsImageAnswer()+";voice answer:"+getIsVoiceAnswer()+";answer type:"+getAnswerType());
+    public void showInfo() {
+        Log.d("ppp", "image answer:" + getIsImageAnswer() + ";voice answer:" + getIsVoiceAnswer() + ";answer type:" + getAnswerType());
     }
+
+    public String getQuestionImageFilePath() {
+        String result = null;
+        if (getIsImageQuestion()) {
+            if (getQuestion() != null) result = getQuestion();
+        }
+        return result;
+    }
+
 
 }

@@ -74,6 +74,8 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     RelativeLayout rltSec, rltTextAnswer, rltPictureAnswer, rltUploadProgress;
     Button btnSubmit;
     ProgressBar progressUpload;
+    private boolean isPickingQuestionPicture = false;
+    private boolean isSaving = false;
 
     // VALUE ARRAY
     String levelValues[] = {"hard", "medium", "easy"};
@@ -146,6 +148,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             pictures[i].setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.M)
                 public void onClick(View v) {
+                    isPickingQuestionPicture = false;
                     interactingPicture = ((ImageView) v);
                     requestPermissionForReadExternalStorage(IntentCode.PICK_ANSWER_PICTURE_CODE);
                 }
@@ -206,12 +209,12 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                         answerType = "voice";
                         break;
                 }
-                solveVisibility(answerType);
+                solveAnswerVisibility(answerType);
             }
         });
     }
 
-    private void solveVisibility(String answerType) {
+    private void solveAnswerVisibility(String answerType) {
         if (answerType.equals("voice")) {
             rltTextAnswer.setVisibility(View.GONE);
             rltPictureAnswer.setVisibility(View.GONE);
@@ -230,7 +233,8 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFormValid()) {
+                if (!isSaving) {
+                    isSaving = true;
                     String answerTypeSelected = getAnswerTypeSelected();
                     if (answerTypeSelected == "text") {
                         onSaveTextAnswer();
@@ -239,8 +243,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                     } else if (answerTypeSelected == "picture") {
                         onSavePictureAnswer();
                     }
-                } else {
-                    showInValidMessage();
                 }
             }
         });
@@ -263,34 +265,54 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         return result;
     }
 
-    private boolean isFormValid() {
-        String question = txtQuestion.getText().toString().trim();
-        return (!question.isEmpty());
-    }
-
     // ON SAVE
     private void onSaveTextAnswer() {
         HashMap<String, String> saveParams = getSaveParams();
-        boolean isVoiceAnswer = saveParams.get("answerType").equals("voice");
-        if (isVoiceAnswer) {
-            onReallySaveTextAnswer(isVoiceAnswer, "", "", "", "", saveParams);
+        if (isVoiceAnswerSelected(saveParams)) {
+            onReallySaveTextAnswer(saveParams);
         } else {
-            String answerA = edtAnswerA.getText().toString().trim();
-            String answerB = edtAnswerB.getText().toString().trim();
-            String answerC = edtAnswerC.getText().toString().trim();
-            String answerD = edtAnswerD.getText().toString().trim();
-            if (isTextQuestionOptionValid(answerA, answerB, answerC, answerD)) {
-                onReallySaveTextAnswer(isVoiceAnswer, answerA, answerB, answerC, answerD, saveParams);
+            if (isTextQuestionOptionValid()) {
+                onReallySaveTextAnswer(saveParams);
             } else {
                 showInValidMessage();
             }
         }
     }
 
-    private void onReallySaveTextAnswer(boolean isVoiceAnswer, String answerA, String answerB, String answerC, String answerD, HashMap<String, String> saveParams) {
-        questionPictureManager.deleteAllIfExist();
+    private void onReallySaveTextAnswer(HashMap<String, String> saveParams) {
+        switch (QuestionFormData.getQuestionType()) {
+            case "text":
+                questionPictureManager.deleteQuestionIfExist();
+                saveTextAnswer(saveParams);
+                break;
+            case "picture":
+                if (questionPictureManager.getQuestionUri() != null) {
+                    totalUpload = 1;
+                    rltUploadProgress.setVisibility(View.VISIBLE);
+                    questionPictureManager.uploadQuestionImage(this);
+                } else {
+                    saveTextAnswer(saveParams);
+                }
+                break;
+            case "voice":
+                break;
+        }
+    }
+
+    private void saveTextAnswer(HashMap<String, String> saveParams) {
+        questionPictureManager.deleteAllAnswerIfExist();
+        String answerA, answerB, answerC, answerD;
+        if (isVoiceAnswerSelected(saveParams)) {
+            answerA = answerB = answerC = answerD = "";
+        } else {
+            answerA = edtAnswerA.getText().toString().trim();
+            answerB = edtAnswerB.getText().toString().trim();
+            answerC = edtAnswerC.getText().toString().trim();
+            answerD = edtAnswerD.getText().toString().trim();
+        }
+        String questionContent = getQuestionContent();
         if (formType.equals("edit")) {
-            item.setQuestion(saveParams.get("question"));
+            item.setQuestion(questionContent);
             item.setAnswerA(answerA);
             item.setAnswerB(answerB);
             item.setAnswerC(answerC);
@@ -298,24 +320,29 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             item.setLevel(saveParams.get("level"));
             item.setLastInteracted(Helper.getTime());
             item.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
-            item.setVoiceAnswer(isVoiceAnswer);
+            item.setVoiceAnswer(isVoiceAnswerSelected(saveParams));
             item.setImageAnswer(false);
+            item.setQuestionType(QuestionFormData.getQuestionType());
             solveEdit(item);
         } else if (formType.equals("add")) {
-            Question questionObj = new Question(null, saveParams.get("question"), null,
+            Question questionObj = new Question(null, questionContent, null,
                     answerA, answerB, answerC, answerD, saveParams.get("level"),
-                    Helper.getTime(), Helper.getTime(), QuestionFormData.isImageQuestion(), QuestionFormData.isAudioQuestion(), isVoiceAnswer, false);
+                    Helper.getTime(), Helper.getTime(), QuestionFormData.isImageQuestion(), QuestionFormData.isAudioQuestion(), isVoiceAnswerSelected(saveParams), false);
             questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
             solveAdd(questionObj);
         }
     }
 
+    private boolean isVoiceAnswerSelected(HashMap<String, String> saveParams) {
+        return saveParams.get("answerType").equals("voice");
+    }
+
     private void onSavePictureAnswer() {
-        if (isPictureAnswerOptionValid() && questionPictureManager.isAnswerUriValid()) {
+        if (isOtherOptionValid() && questionPictureManager.isAnswerUriValid()) {
             totalUpload = questionPictureManager.getTotalUpload();
             if (totalUpload > 0) {
                 rltUploadProgress.setVisibility(View.VISIBLE);
-                questionPictureManager.upload(QuestionFormFragment.this);
+                questionPictureManager.uploadAll(QuestionFormFragment.this);
             } else {
                 savePictureAnswer();
             }
@@ -339,10 +366,13 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         questionModel.addItem(question, "add-item");
     }
 
-    private boolean isTextQuestionOptionValid(String answerA, String answerB, String answerC, String answerD) {
-        String answerArr[] = {answerA, answerB, answerC, answerD};
+    private boolean isTextQuestionOptionValid() {
+        String answerA = edtAnswerA.getText().toString().trim();
+        String answerB = edtAnswerB.getText().toString().trim();
+        String answerC = edtAnswerC.getText().toString().trim();
+        String answerD = edtAnswerD.getText().toString().trim();
         if (
-                isPictureAnswerOptionValid() &&
+                isOtherOptionValid() &&
                         !answerA.trim().isEmpty() &&
                         !answerB.trim().isEmpty() &&
                         !answerC.trim().isEmpty() &&
@@ -351,11 +381,10 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         return false;
     }
 
-    private boolean isPictureAnswerOptionValid() {
+    private boolean isOtherOptionValid() {
         HashMap<String, String> saveParams = getSaveParams();
         if (
-                !saveParams.get("question").isEmpty() &&
-                        !saveParams.get("answerType").isEmpty() &&
+                !saveParams.get("answerType").isEmpty() &&
                         !saveParams.get("level").isEmpty() &&
                         !saveParams.get("correctAnswerInLetter").trim().isEmpty()
         ) return true;
@@ -458,7 +487,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     // PERMISSION
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.d("xxx", "on request permission for result:" + requestCode);
         if (isPickPictureCode(
                 requestCode) &&
                 grantResults.length > 0 &&
@@ -477,6 +505,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("xxx", "request code: " + requestCode);
         if (
                 isPickPictureCode(requestCode) &&
                         resultCode == getActivity().RESULT_OK &&
@@ -484,10 +513,11 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             Uri filePath = data.getData();
             QuestionFormData.setQuestionImageUri(filePath);
 
-            if (requestCode == IntentCode.PICK_ANSWER_PICTURE_CODE)
+            if (!isPickingQuestionPicture) {
                 questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
-            else if (requestCode == IntentCode.PICTURE_QUESTION_PICTURE_CODE)
+            } else {
                 questionPictureManager.setQuestionUri(filePath);
+            }
             Helper.setImageViewImageByUri(getActivity(), interactingPicture, filePath);
 
         }
@@ -497,6 +527,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     // STORAGE CALLBACK
     @Override
     public void uploadedCallback(String url, int code) {
+        Log.d("xxx", "uploaded: " + url);
         questionPictureManager.setPathByIndex(code, url);
     }
 
@@ -504,24 +535,34 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     public void progressCallback(double value, int code) {
         progressArr[code] = value;
         double totalProgress = 0;
-        for (int i = 0; i < 4; i++) totalProgress += progressArr[i];
+        for (int i = 0; i < 5; i++) totalProgress += progressArr[i];
         progress = (int) (((totalProgress / 100) / totalUpload) * 100);
         progressUpload.setProgress(progress);
         txtUploadProgress.setText(progress + "%");
         if (progress == 100) {
+
             new android.os.Handler().postDelayed(
                     new Runnable() {
                         public void run() {
-                            savePictureAnswer();
+                            switch (getAnswerTypeSelected()) {
+                                case "text":
+                                    saveTextAnswer(getSaveParams());
+                                    break;
+                                case "picture":
+                                    savePictureAnswer();
+                                    break;
+                            }
                         }
                     }, 500);
+
         }
     }
 
     public void savePictureAnswer() {
         HashMap<String, String> saveParams = getSaveParams();
+        String questionContent = getQuestionContent();
         if (formType.equals("edit")) {
-            item.setQuestion(saveParams.get("question"));
+            item.setQuestion(questionContent);
             item.setAnswerA(questionPictureManager.getAnswerAPath());
             item.setAnswerB(questionPictureManager.getAnswerBPath());
             item.setAnswerC(questionPictureManager.getAnswerCPath());
@@ -531,15 +572,31 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             item.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
             item.setVoiceAnswer(false);
             item.setImageAnswer(true);
+            item.setQuestionType(QuestionFormData.getQuestionType());
             solveEdit(item);
         } else if (formType.equals("add")) {
-            Question questionObj = new Question(saveParams.get("id"), saveParams.get("question"), saveParams.get("correctAnswerInLetter"),
+            Question questionObj = new Question(saveParams.get("id"), questionContent, saveParams.get("correctAnswerInLetter"),
                     questionPictureManager.getAnswerAPath(),
                     questionPictureManager.getAnswerBPath(), questionPictureManager.getAnswerCPath(), questionPictureManager.getAnswerDPath(),
                     saveParams.get("level"), Helper.getTime(), Helper.getTime(), QuestionFormData.isImageQuestion(), QuestionFormData.isAudioQuestion(), false, true);
             questionObj.generateCorrectAnswerByLetter(saveParams.get("correctAnswerInLetter"));
             solveAdd(questionObj);
         }
+    }
+
+    private String getQuestionContent() {
+        String result = null;
+        switch (QuestionFormData.getQuestionType()) {
+            case "text":
+                result = txtQuestion.getText().toString();
+                break;
+            case "picture":
+                result = questionPictureManager.getQuestionPath();
+                break;
+            case "voice":
+                break;
+        }
+        return result;
     }
 
     @Override
@@ -559,28 +616,57 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private void onGetEditItemCallBack(Question item) {
         this.item = item;
         QuestionFormData.setQuestion(item);
-        txtQuestion.setText(item.getQuestion());
         ((RadioButton) radioGroupAnswerType.getChildAt(getTypePos(item.getAnswerType()))).setChecked(true);
         Helper.hideKeyboard(getCalledActivity());
-        if (item.getIsVoiceAnswer()) {
-            setVoiceAnswerView();
-            solveVisibility("voice");
-        } else if (item.getIsImageAnswer()) {
-            setPictureAnswerView();
-            solveVisibility("picture");
-        } else {
-            setTextAnswerView();
-            solveVisibility("text");
+        solveQuestionVisibility(item.getQuestionType());
+        solveAnswerVisibility(item.getAnswerType());
+
+        // QUESTION VIEW
+        switch (item.getQuestionType()) {
+            case "text":
+                setTextQuestionView();
+                break;
+            case "picture":
+                setPictureQuestionView();
+                break;
+            case "voice":
+                setAudioQuestionView();
+                break;
+        }
+
+        // ANSWER VIEW
+        switch (item.getAnswerType()) {
+            case "text":
+                setTextAnswerView();
+                break;
+            case "picture":
+                setPictureAnswerView();
+                break;
+            case "voice":
+                setVoiceAnswerView();
+                break;
         }
         initQuestionPictureManager();
     }
 
-    // SET VIEW
+    // SET ANSWER VIEW
+    private void setAudioQuestionView() {
+    }
+
+    private void setPictureQuestionView() {
+        Picasso.get().load(item.getQuestion()).into(pictureQuestion);
+    }
+
+    private void setTextQuestionView() {
+        txtQuestion.setText(item.getQuestion());
+    }
+
+
+    // SET ANSWER VIEW
     private void setVoiceAnswerView() {
     }
 
     private void setTextAnswerView() {
-        txtQuestion.setText(item.getQuestion());
         edtAnswerA.setText(item.getAnswerA());
         edtAnswerB.setText(item.getAnswerB());
         edtAnswerC.setText(item.getAnswerC());
@@ -607,6 +693,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         initQuestionPictureManager();
         resetLayoutAndParams(item.getAnswerType());
         Toast.makeText(getActivity(), "Item  updated", Toast.LENGTH_SHORT).show();
+        isSaving = false;
     }
 
     private void onAddItemCallBack(Question item) {
@@ -640,13 +727,10 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private HashMap<String, String> getSaveParams() {
         HashMap<String, String> saveParams = new HashMap<>();
         String id = (formType.equals("edit")) ? item.getId() : null;
-        String question = txtQuestion.getText().toString().trim();
         String level = getQuestionLevelValue();
         String answerType = getAnswerTypeSelected();
         String correctAnswer = getCorrectAnswerValue();
-
         saveParams.put("id", id);
-        saveParams.put("question", question);
         saveParams.put("level", level);
         saveParams.put("answerType", answerType);
         saveParams.put("correctAnswerInLetter", correctAnswer);
@@ -685,12 +769,13 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     public void showInValidMessage() {
+        isSaving = false;
         Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
     }
 
     public void setDefaultPictureAnswerParams() {
         totalUpload = 0;
-        progressArr = new double[]{0, 0, 0, 0};
+        progressArr = new double[]{0, 0, 0, 0, 0};
         progress = 0;
     }
 
@@ -701,8 +786,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     public void onAddQuestionDialogDismiss() {
-        Toast.makeText(getCalledActivity(), "add question dismiss", Toast.LENGTH_SHORT).show();
-        solveQuestionVisibility();
+        solveQuestionVisibility(QuestionFormData.getQuestionType());
         switch (QuestionFormData.getQuestionType()) {
             case "text":
                 txtQuestion.setText(QuestionFormData.getQuestionText());
@@ -714,8 +798,8 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         }
     }
 
-    private void solveQuestionVisibility() {
-        switch (QuestionFormData.getQuestionType()) {
+    private void solveQuestionVisibility(String type) {
+        switch (type) {
             case "text":
                 txtQuestion.setVisibility(View.VISIBLE);
                 pictureQuestion.setVisibility(View.GONE);
@@ -736,6 +820,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onPickQuestionPicture() {
+        isPickingQuestionPicture = true;
         interactingPicture = pictureQuestion;
         requestPermissionForReadExternalStorage(IntentCode.PICTURE_QUESTION_PICTURE_CODE);
     }

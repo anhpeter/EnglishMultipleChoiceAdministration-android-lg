@@ -59,10 +59,9 @@
             android:id="@+id/imgQuestion"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:visibility="gone"
             android:background="@color/light"
             android:scaleType="fitCenter"
-            ></ImageView>
+            android:visibility="gone"></ImageView>
 
     </RelativeLayout>
 
@@ -83,13 +82,29 @@
         android:layout_below="@+id/layoutOptions"
         android:layout_marginTop="20dp">
 
-        <!-- TEXT ANSWER -->
-        <include layout="@layout/text_answer" />
+        <RelativeLayout
+            android:id="@+id/rltAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <!-- TEXT ANSWER -->
+            <include layout="@layout/text_answer" />
 
-        <!-- PICTURE ANSWER -->
-        <include
-            layout="@layout/picture_answer"
-            android:visibility="gone" />
+            <!-- PICTURE ANSWER -->
+            <include
+                layout="@layout/picture_answer"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <!-- UPLOAD PROGRESS-->
+        <RelativeLayout
+            android:id="@+id/rltProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rltAnswer">
+
+            <include layout="@layout/upload_progress" />
+        </RelativeLayout>
+
     </RelativeLayout>
 
     <!-- SUBMIT BUTTON -->

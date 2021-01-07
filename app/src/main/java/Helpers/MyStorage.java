@@ -35,13 +35,12 @@ public class MyStorage {
     private MyStorage() {
     }
 
-    public void uploadImage(Uri filePath, final int code, Fragment fragment) {
+    public void uploadImage(Uri uri, final int code, Fragment fragment) {
         iMyStorage = (IMyStorage) fragment;
-
-        if (filePath != null) {
+        if (uri != null) {
             String fileName = System.currentTimeMillis() + "";
             StorageReference ref = storageReference.child("images/" + fileName);
-            ref.putFile(filePath)
+            ref.putFile(uri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {

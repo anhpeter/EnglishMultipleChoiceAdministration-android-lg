@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 
 import com.example.multiple_choice.R;
+import com.squareup.picasso.Picasso;
 
 import Defines.FragmentCommunicate;
 import Defines.IntentCode;
@@ -63,7 +64,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
         initPictureQuestionClick();
     }
 
-    private void initPictureQuestionClick(){
+    private void initPictureQuestionClick() {
         pictureQuestion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +85,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 onQuestionTypeClick("picture");
                 if (!isPictureTypeClicked) setPictureQuestionIfExist();
-                if (QuestionFormData.getQuestionImageUri() == null) {
+                if (QuestionFormData.getQuestionImageUri() == null && QuestionFormData.getQuestionImageFilePath() == null) {
                     pickQuestionPicture();
                 }
             }
@@ -97,7 +98,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
         });
     }
 
-    private void pickQuestionPicture(){
+    private void pickQuestionPicture() {
         dialog.dismiss();
         fragmentCommunicate.communicate("on-picture-type-click", AddQuestionDialogFragment.fragmentName);
     }
@@ -165,6 +166,8 @@ public class AddQuestionDialogFragment extends DialogFragment {
     private void setPictureQuestionIfExist() {
         if (QuestionFormData.getQuestionImageUri() != null) {
             Helper.setImageViewImageByUri(getActivity(), pictureQuestion, QuestionFormData.getQuestionImageUri());
+        } else if (QuestionFormData.getQuestionImageFilePath() != null) {
+            Picasso.get().load(QuestionFormData.getQuestionImageFilePath()).into(pictureQuestion);
         }
     }
 

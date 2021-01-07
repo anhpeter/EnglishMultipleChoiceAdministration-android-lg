@@ -23,7 +23,7 @@ public class QuestionPictureManager {
         updateParams(questionPath, answerAPath, answerBPath, answerCPath, answerDPath);
     }
 
-    public void updateParams(String questionPath, String answerAPath, String answerBPath, String answerCPath, String answerDPath){
+    public void updateParams(String questionPath, String answerAPath, String answerBPath, String answerCPath, String answerDPath) {
         reset();
         this.questionPath = questionPath;
         this.answerAPath = answerAPath;
@@ -32,7 +32,7 @@ public class QuestionPictureManager {
         this.answerDPath = answerDPath;
     }
 
-    public void reset(){
+    public void reset() {
         setAnswerAPath(null);
         setAnswerBPath(null);
         setAnswerCPath(null);
@@ -166,34 +166,46 @@ public class QuestionPictureManager {
 
     public boolean isAnswerUriValid() {
         if (
-                (getAnswerAUri() != null || getAnswerAPath()!=null) &&
-                (getAnswerBUri() != null || getAnswerBPath()!=null) &&
-                (getAnswerCUri() != null || getAnswerCPath()!=null) &&
-                (getAnswerDUri() != null || getAnswerDPath()!=null)
+                (getAnswerAUri() != null || getAnswerAPath() != null) &&
+                        (getAnswerBUri() != null || getAnswerBPath() != null) &&
+                        (getAnswerCUri() != null || getAnswerCPath() != null) &&
+                        (getAnswerDUri() != null || getAnswerDPath() != null)
         ) return true;
         return false;
     }
 
-    public int getTotalUpload(){
+    public int getTotalUpload() {
         int count = 0;
-        if (getAnswerAUri() !=null) count++;
-        if (getAnswerBUri() !=null) count++;
-        if (getAnswerCUri() !=null) count++;
-        if (getAnswerDUri() !=null) count++;
+        if (getAnswerAUri() != null) count++;
+        if (getAnswerBUri() != null) count++;
+        if (getAnswerCUri() != null) count++;
+        if (getAnswerDUri() != null) count++;
+        if (getQuestionUri() != null) count++;
         return count;
     }
 
     // UPLOAD & DELETE
-    public void upload(Fragment fragment){
+    public void uploadAll(Fragment fragment) {
+        uploadAnswerImage(fragment);
+        uploadQuestionImage(fragment);
+    }
+
+    public void uploadAnswerImage(Fragment fragment) {
         MyStorage myStorage = MyStorage.getInstance();
-        deleteOldFile();
+        deleteOldAnswerFile();
         myStorage.uploadImage(getAnswerAUri(), 0, fragment);
         myStorage.uploadImage(getAnswerBUri(), 1, fragment);
         myStorage.uploadImage(getAnswerCUri(), 2, fragment);
         myStorage.uploadImage(getAnswerDUri(), 3, fragment);
     }
 
-    private void deleteOldFile(){
+    public void uploadQuestionImage(Fragment fragment) {
+        MyStorage myStorage = MyStorage.getInstance();
+        deleteOldQuestionFile();
+        myStorage.uploadImage(getQuestionUri(), 4, fragment);
+    }
+
+    private void deleteOldAnswerFile() {
         MyStorage myStorage = MyStorage.getInstance();
         if (getAnswerAPath() != null && getAnswerAUri() != null) myStorage.delete(getAnswerAPath());
         if (getAnswerBPath() != null && getAnswerBUri() != null) myStorage.delete(getAnswerBPath());
@@ -201,7 +213,19 @@ public class QuestionPictureManager {
         if (getAnswerDPath() != null && getAnswerDUri() != null) myStorage.delete(getAnswerDPath());
     }
 
-    public void deleteAllIfExist(){
+    private void deleteOldQuestionFile() {
+        if (getQuestionUri() != null)
+            deleteQuestionIfExist();
+    }
+
+    public void deleteQuestionIfExist() {
+        MyStorage myStorage = MyStorage.getInstance();
+        if (getQuestionPath() != null){
+            myStorage.delete(getQuestionPath());
+        }
+    }
+
+    public void deleteAllAnswerIfExist() {
         MyStorage myStorage = MyStorage.getInstance();
         if (getAnswerAPath() != null) myStorage.delete(getAnswerAPath());
         if (getAnswerBPath() != null) myStorage.delete(getAnswerBPath());
@@ -209,4 +233,7 @@ public class QuestionPictureManager {
         if (getAnswerDPath() != null) myStorage.delete(getAnswerDPath());
     }
 
+    public void deleteAllIfExist() {
+        deleteAllAnswerIfExist();
+    }
 }

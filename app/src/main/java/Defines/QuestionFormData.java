@@ -7,7 +7,7 @@ import android.util.Log;
 public class QuestionFormData {
     private static Question question;
     private static String questionText;
-
+    private static String questionImageFilePath;
     private static Uri questionImageUri;
     private static MediaRecorder questionRecorder;
     private static String questionType = "text";
@@ -17,6 +17,7 @@ public class QuestionFormData {
         questionText = null;
         questionImageUri = null;
         questionRecorder = null;
+        questionImageFilePath = null;
         questionType = "text";
     }
 
@@ -59,13 +60,14 @@ public class QuestionFormData {
 
     public static void setQuestion(Question question) {
         QuestionFormData.question = question;
-
         setQuestionType(question.getQuestionType());
         switch (question.getQuestionType()) {
             case "text":
                 setQuestionText(question.getQuestion());
                 break;
             case "picture":
+                setQuestionImageFilePath(question.getQuestion());
+                break;
             case "audio":
         }
     }
@@ -86,5 +88,12 @@ public class QuestionFormData {
         return result;
     }
 
+    public static String getQuestionImageFilePath() {
+        return questionImageFilePath;
+    }
+
+    public static void setQuestionImageFilePath(String questionImageFilePath) {
+        QuestionFormData.questionImageFilePath = questionImageFilePath;
+    }
 
 }

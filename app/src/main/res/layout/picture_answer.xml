@@ -109,34 +109,6 @@
             android:src="@drawable/add_picture"></ImageView>
     </LinearLayout>
 
-    <!-- UPLOAD PROGRESS -->
-    <RelativeLayout
-        android:id="@+id/rltProgressUpload"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_below="@id/linearPictureAnswerLine2"
-        android:visibility="gone">
-
-        <ProgressBar
-            android:id="@+id/progressUpload"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/txtUploadProgress"
-            android:progressTint="#008EFF"></ProgressBar>
-
-        <TextView
-            android:id="@+id/txtUploadProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-
-            android:gravity="center_vertical"
-            android:text="0%"
-            android:textColor="#008EFF"
-            android:textSize="16sp"></TextView>
-    </RelativeLayout>
 </RelativeLayout>
 
 
