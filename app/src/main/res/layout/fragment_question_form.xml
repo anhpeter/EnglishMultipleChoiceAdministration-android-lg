@@ -32,7 +32,9 @@
             android:text="12 Sec"
             android:textColor="#FFFFFF"
             android:textStyle="bold"></TextView>
+
     </RelativeLayout>
+
 
     <!-- QUESTION -->
     <RelativeLayout
@@ -62,6 +64,7 @@
             android:background="@color/light"
             android:scaleType="fitCenter"
             android:visibility="gone"></ImageView>
+
 
     </RelativeLayout>
 

@@ -1,6 +1,7 @@
 package Defines;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.multiple_choice.R;
+import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
@@ -47,6 +50,7 @@ public class QuestionAdapter extends BaseAdapter {
 
     class ViewHolder{
         TextView txtQuestion, txtAnswerType, txtThumb;
+        ImageView imgThumb;
     }
 
     @Override
@@ -60,6 +64,7 @@ public class QuestionAdapter extends BaseAdapter {
             holder.txtQuestion  = (TextView) convertView.findViewById(R.id.txtQuestion);
             holder.txtAnswerType  = (TextView) convertView.findViewById(R.id.txtAnswerType);
             holder.txtThumb  = (TextView) convertView.findViewById(R.id.txtThumb);
+            holder.imgThumb  = (ImageView) convertView.findViewById(R.id.imgThumb);
             convertView.setTag(holder);
         }else{
             holder = (QuestionAdapter.ViewHolder) convertView.getTag();
@@ -68,10 +73,27 @@ public class QuestionAdapter extends BaseAdapter {
         Question question = questionArrayList.get(position);
         holder.txtQuestion.setText(question.getQuestion());
         holder.txtAnswerType.setText("Type: "+question.getAnswerType());
-        String thumbText = (question.getIsImageQuestion()) ? "P" : Helper.getUppercaseFirstCharacter(question.getQuestion());
-        holder.txtThumb.setText(thumbText);
+        // thumb
+        solveThumbVisibility(holder, question);
+        if (question.getIsImageQuestion()){
+            Picasso.get().load(question.getQuestion()).into(holder.imgThumb);
+        }else{
+            String thumbText = (question.getIsImageQuestion()) ? "P" : Helper.getUppercaseFirstCharacter(question.getQuestion());
+            holder.txtThumb.setText(thumbText);
+        }
+
         Animation animScale = AnimationUtils.loadAnimation(context, R.anim.anim_scale_for_listview_item);
         convertView.startAnimation(animScale);
         return convertView;
+    }
+
+    private void solveThumbVisibility(ViewHolder holder, Question question){
+        if (question.getIsImageQuestion()){
+            holder.imgThumb.setVisibility(View.VISIBLE);
+            holder.txtThumb.setVisibility(View.GONE);
+        }else{
+            holder.txtThumb.setVisibility(View.VISIBLE);
+            holder.imgThumb.setVisibility(View.GONE);
+        }
     }
 }

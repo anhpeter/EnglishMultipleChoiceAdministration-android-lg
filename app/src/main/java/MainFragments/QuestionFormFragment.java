@@ -276,11 +276,13 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             } else {
                 showInValidMessage();
             }
+
         }
     }
 
     private void onReallySaveTextAnswer(HashMap<String, String> saveParams) {
         switch (QuestionFormData.getQuestionType()) {
+            case "audio":
             case "text":
                 questionPictureManager.deleteQuestionIfExist();
                 saveTextAnswer(saveParams);
@@ -293,8 +295,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                 } else {
                     saveTextAnswer(saveParams);
                 }
-                break;
-            case "voice":
                 break;
         }
     }
@@ -587,13 +587,12 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private String getQuestionContent() {
         String result = null;
         switch (QuestionFormData.getQuestionType()) {
+            case "audio":
             case "text":
                 result = txtQuestion.getText().toString();
                 break;
             case "picture":
                 result = questionPictureManager.getQuestionPath();
-                break;
-            case "voice":
                 break;
         }
         return result;
@@ -756,6 +755,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     public void resetAll() {
+        Helper.clearImageView(pictureQuestion);
         pictureA.setImageResource(R.drawable.add_picture);
         pictureB.setImageResource(R.drawable.add_picture);
         pictureC.setImageResource(R.drawable.add_picture);
@@ -794,6 +794,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             case "picture":
                 break;
             case "audio":
+                txtQuestion.setText(QuestionFormData.getQuestionSpeech());
                 break;
         }
     }

@@ -151,4 +151,8 @@ public class Helper {
             e.printStackTrace();
         }
     }
+
+    public static void clearImageView(ImageView img) {
+        img.setImageResource(android.R.color.transparent);
+    }
 }

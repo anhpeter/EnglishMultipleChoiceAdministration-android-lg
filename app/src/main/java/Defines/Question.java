@@ -48,6 +48,7 @@ public class Question {
         this.setIsImageQuestion(isImageQuestion);
         this.setImageAnswer(isImageAnswer);
         this.setVoiceAnswer(isVoiceAnswer);
+        this.setIsAudioQuestion(isAudioQuestion);
     }
 
     public String getQuestion() {
@@ -129,7 +130,7 @@ public class Question {
     // CREATE QUESTION BY FIREBASE DATA SNAPSHOT
     public static Question getQuestionByDataSnapshot(DataSnapshot dataSnapshot) {
         if (dataSnapshot != null) {
-            try{
+            try {
 
                 String id = dataSnapshot.getKey();
                 String question = dataSnapshot.child("Question").getValue().toString();
@@ -148,9 +149,9 @@ public class Question {
                 long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
                 Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer, isImageAnswer);
                 return qt;
-            }catch (Exception e){
+            } catch (Exception e) {
                 String id = dataSnapshot.getKey();
-                Log.d("xxx", "doc err: "+id);
+                Log.d("xxx", "doc err: " + id);
             }
         }
         return null;
@@ -290,11 +291,6 @@ public class Question {
         else if (getIsAudioQuestion()) result = "audio";
         else result = "text";
         return result;
-    }
-
-    public void setAnswerType(String value) {
-        setVoiceAnswer(value.equals("voice"));
-        setImageAnswer(value.equals("picture"));
     }
 
     public void setQuestionType(String value) {

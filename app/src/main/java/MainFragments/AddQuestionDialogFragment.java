@@ -9,6 +9,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.speech.tts.TextToSpeech;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -22,9 +25,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import com.example.multiple_choice.R;
+import com.google.rpc.Help;
 import com.squareup.picasso.Picasso;
+
+import java.util.Locale;
 
 import Defines.FragmentCommunicate;
 import Defines.IntentCode;
@@ -35,21 +42,22 @@ import Helpers.Helper;
 public class AddQuestionDialogFragment extends DialogFragment {
 
     public static String fragmentName = "add-question-dialog";
-    EditText edtQuestion;
-    ImageView pictureQuestion;
-    RelativeLayout rltTextForm, rltPictureForm, textType, imageType, audioType;
-    FrameLayout frameVoiceForm;
+    EditText edtQuestion, edtSpeech;
+    ImageView pictureQuestion, imgAudio, imgText, imgPicture, imgSpeaker;
+    RelativeLayout rltTextForm, rltPictureForm, textType, imageType, audioType, rltAudioForm;
     Dialog dialog;
     FragmentCommunicate fragmentCommunicate;
 
     boolean isAudioTypeClicked = false;
     boolean isPictureTypeClicked = false;
     boolean isTextTypeClicked = false;
+    TextToSpeech tts;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // init
         initDialog();
+        initTextToSpeech();
 
         // init form
         initForm();
@@ -59,9 +67,74 @@ public class AddQuestionDialogFragment extends DialogFragment {
         return dialog;
     }
 
+    private void initTextToSpeech() {
+        tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int ttsLang = tts.setLanguage(Locale.US);
+
+                    if (ttsLang == TextToSpeech.LANG_MISSING_DATA
+                            || ttsLang == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Log.e("TTS", "The Language is not supported!");
+                    } else {
+                        Log.i("TTS", "Language Supported.");
+                    }
+                    Log.i("TTS", "Initialization success.");
+                } else {
+                }
+            }
+        });
+    }
+
     private void initEvents() {
         initQuestionTypeClick();
         initPictureQuestionClick();
+        initSpeakerClick();
+        initEdtSpeechTextChanged();
+    }
+
+    private void initEdtSpeechTextChanged() {
+        edtSpeech.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateSpeakerStatus();
+            }
+        });
+    }
+
+    private void updateSpeakerStatus(){
+        String speech = edtSpeech.getText().toString();
+        if (speech.trim() == "") {
+            imgSpeaker.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.audio_icon_disabled));
+        } else {
+            imgSpeaker.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.black_audio_icon));
+        }
+    }
+
+    private void initSpeakerClick() {
+        imgSpeaker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String speech = edtSpeech.getText().toString();
+                if (speech.trim() != "") {
+                    int speechStatus = tts.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+                    if (speechStatus == TextToSpeech.ERROR) {
+                        Log.e("xxx", "Error in converting Text to Speech!");
+                    }
+                }
+            }
+        });
     }
 
     private void initPictureQuestionClick() {
@@ -77,22 +150,23 @@ public class AddQuestionDialogFragment extends DialogFragment {
         textType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onQuestionTypeClick("text");
                 if (!isTextTypeClicked) edtQuestion.setText(QuestionFormData.getQuestionText());
+                onQuestionTypeClick("text");
             }
         });
         imageType.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                onQuestionTypeClick("picture");
                 if (!isPictureTypeClicked) setPictureQuestionIfExist();
                 if (QuestionFormData.getQuestionImageUri() == null && QuestionFormData.getQuestionImageFilePath() == null) {
                     pickQuestionPicture();
                 }
+                onQuestionTypeClick("picture");
             }
         });
         audioType.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isAudioTypeClicked) edtSpeech.setText(QuestionFormData.getQuestionSpeech());
                 onQuestionTypeClick("audio");
             }
         });
@@ -104,8 +178,10 @@ public class AddQuestionDialogFragment extends DialogFragment {
     }
 
     private void onQuestionTypeClick(String type) {
+        setIsTypeClicked(type);
         QuestionFormData.setQuestionType(type);
         solveFormVisibility();
+        activeCurrentQuestionType(type);
     }
 
     private Question getQuestion() {
@@ -114,6 +190,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
     private void initForm() {
         setIsTypeClicked(QuestionFormData.getQuestionType());
+        activeCurrentQuestionType(QuestionFormData.getQuestionType());
         solveFormVisibility();
         switch (QuestionFormData.getQuestionType()) {
             case "text":
@@ -136,15 +213,15 @@ public class AddQuestionDialogFragment extends DialogFragment {
             case "text":
                 rltTextForm.setVisibility(View.VISIBLE);
                 rltPictureForm.setVisibility(View.GONE);
-                frameVoiceForm.setVisibility(View.GONE);
+                rltAudioForm.setVisibility(View.GONE);
                 break;
             case "picture":
                 rltPictureForm.setVisibility(View.VISIBLE);
                 rltTextForm.setVisibility(View.GONE);
-                frameVoiceForm.setVisibility(View.GONE);
+                rltAudioForm.setVisibility(View.GONE);
                 break;
             case "audio":
-                frameVoiceForm.setVisibility(View.VISIBLE);
+                rltAudioForm.setVisibility(View.VISIBLE);
                 rltTextForm.setVisibility(View.GONE);
                 rltPictureForm.setVisibility(View.GONE);
                 break;
@@ -155,8 +232,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
     private void initTextForm() {
         edtQuestion.setText(QuestionFormData.getQuestionText());
         edtQuestion.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        Helper.showKeyboard(edtQuestion, getActivity());
     }
 
     private void initImageForm() {
@@ -172,22 +248,11 @@ public class AddQuestionDialogFragment extends DialogFragment {
     }
 
     private void initAudioForm() {
-
+        edtSpeech.setText(QuestionFormData.getQuestionSpeech());
+        updateSpeakerStatus();
+        edtQuestion.requestFocus();
+        Helper.showKeyboard(edtSpeech, getActivity());
     }
-
-    private void initEditForm() {
-        switch (QuestionFormData.getQuestionType()) {
-            case "text":
-                Helper.showKeyboard(edtQuestion, getActivity());
-                edtQuestion.setText(QuestionFormData.getQuestionText());
-                break;
-            case "picture":
-                break;
-            case "audio":
-                break;
-        }
-    }
-    //
 
     private void initDialog() {
         fragmentCommunicate = (FragmentCommunicate) getActivity();
@@ -212,14 +277,22 @@ public class AddQuestionDialogFragment extends DialogFragment {
     }
 
     private void mapping() {
+        edtQuestion = (EditText) dialog.findViewById(R.id.edtQuestion);
+        edtSpeech = (EditText) dialog.findViewById(R.id.edtSpeech);
+
         rltTextForm = (RelativeLayout) dialog.findViewById(R.id.textForm);
         rltPictureForm = (RelativeLayout) dialog.findViewById(R.id.pictureForm);
-        edtQuestion = (EditText) dialog.findViewById(R.id.edtQuestion);
+        rltAudioForm = (RelativeLayout) dialog.findViewById(R.id.audioForm);
         textType = (RelativeLayout) dialog.findViewById(R.id.textType);
         audioType = (RelativeLayout) dialog.findViewById(R.id.audioType);
         imageType = (RelativeLayout) dialog.findViewById(R.id.imageType);
+
         pictureQuestion = (ImageView) dialog.findViewById(R.id.pictureQuestion);
-        frameVoiceForm = (FrameLayout) dialog.findViewById(R.id.frameVoiceForm);
+        imgAudio = (ImageView) dialog.findViewById(R.id.imgAudio);
+        imgText = (ImageView) dialog.findViewById(R.id.imgText);
+        imgPicture = (ImageView) dialog.findViewById(R.id.imgPicture);
+        imgSpeaker = (ImageView) dialog.findViewById(R.id.imgSpeaker);
+
     }
 
     @Override
@@ -235,15 +308,37 @@ public class AddQuestionDialogFragment extends DialogFragment {
             case "text":
                 QuestionFormData.setQuestionText(edtQuestion.getText().toString().trim());
                 break;
-            case "picture":
             case "audio":
+                QuestionFormData.setQuestionSpeech(edtSpeech.getText().toString().trim());
                 break;
         }
     }
 
     private void setIsTypeClicked(String type) {
+        //solveTypeVisible(type);
         if (type.equals("text")) isTextTypeClicked = true;
         else if (type.equals("picture")) isPictureTypeClicked = true;
         else if (type.equals("audio")) isAudioTypeClicked = true;
+
+    }
+
+    private void activeCurrentQuestionType(String type) {
+        switch (type) {
+            case "text":
+                imgText.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.blue_pencil_icon));
+                imgAudio.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.audio_icon));
+                imgPicture.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.picture_icon));
+                break;
+            case "picture":
+                imgPicture.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.blue_picture_icon));
+                imgText.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.pencil_icon));
+                imgAudio.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.audio_icon));
+                break;
+            case "audio":
+                imgAudio.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.blue_audio_icon));
+                imgPicture.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.picture_icon));
+                imgText.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.pencil_icon));
+                break;
+        }
     }
 }
