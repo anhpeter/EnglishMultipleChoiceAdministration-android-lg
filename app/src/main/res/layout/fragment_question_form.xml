@@ -20,7 +20,7 @@
             android:layout_centerVertical="true"
             android:scaleType="fitCenter"
             android:src="@drawable/countdown"
-            android:textColor="@color/blue"></ImageView>
+            android:textColor="@color/light"></ImageView>
 
         <TextView
             android:id="@+id/txtSec"
@@ -39,21 +39,30 @@
         android:id="@+id/rltQuestion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/rltSec">
+        android:layout_below="@+id/rltSec"
+        android:layout_marginTop="5dp">
 
 
         <TextView
             android:id="@+id/txtQuestion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:background="@drawable/custom_edit_text_1"
             android:gravity="center"
+            android:hint="Enter question"
             android:paddingVertical="5dp"
             android:paddingLeft="10dp"
-            android:hint="Enter question"
-            android:textStyle="bold"
-            android:textCursorDrawable="@drawable/blue_cursor"></TextView>
+            android:textCursorDrawable="@drawable/blue_cursor"
+            android:textStyle="bold"></TextView>
+
+        <ImageView
+            android:id="@+id/imgQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:visibility="gone"
+            android:background="@color/light"
+            android:scaleType="fitCenter"
+            ></ImageView>
 
     </RelativeLayout>
 

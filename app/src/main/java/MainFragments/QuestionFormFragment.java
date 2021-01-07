@@ -34,6 +34,7 @@ import androidx.annotation.RequiresApi;
 import com.example.multiple_choice.Activity;
 import com.example.multiple_choice.FormActivity;
 import com.example.multiple_choice.R;
+import com.google.rpc.Help;
 import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
@@ -44,6 +45,7 @@ import java.util.HashMap;
 import Defines.FragmentCommunicate;
 import Defines.ICallback;
 import Defines.IMyStorage;
+import Defines.IntentCode;
 import Defines.Question;
 import Defines.QuestionFormData;
 import Helpers.Helper;
@@ -68,7 +70,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     EditText edtAnswerA, edtAnswerB, edtAnswerC, edtAnswerD;
     TextView txtUploadProgress, txtQuestion;
     RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
-    ImageView pictureA, pictureB, pictureC, pictureD;
+    ImageView pictureA, pictureB, pictureC, pictureD, pictureQuestion;
     RelativeLayout rltSec, rltTextAnswer, rltPictureAnswer, rltUploadProgress;
     Button btnSubmit;
     ProgressBar progressUpload;
@@ -84,7 +86,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     ImageView pictures[];
 
     // REQUEST CODE
-    int PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE = 111;
 
     // OTHER
     int totalUpload;
@@ -114,10 +115,12 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         radioPictureA.setChecked(true);
         setArguments();
         onTxtQuestionClick();
+        onPictureQuestionClick();
         onPictureRadiosChecked();
         onPictureClicked();
         onAnswerTypeRadiosChecked();
         onSubmitClick();
+        Helper.hideKeyboard(getCalledActivity());
     }
 
     private void onTxtQuestionClick() {
@@ -129,20 +132,33 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         });
     }
 
+    private void onPictureQuestionClick() {
+        pictureQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddQuestionDialog();
+            }
+        });
+    }
+
     private void onPictureClicked() {
         for (int i = 0; i < pictures.length; i++) {
             pictures[i].setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
                 public void onClick(View v) {
                     interactingPicture = ((ImageView) v);
-                    requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                    Manifest.permission.ACCESS_FINE_LOCATION},
-                            PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
+                    requestPermissionForReadExternalStorage(IntentCode.PICK_ANSWER_PICTURE_CODE);
                 }
             });
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestPermissionForReadExternalStorage(int code) {
+        requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_FINE_LOCATION},
+                code);
     }
 
     private int getAnswerPosByImageViewId(int id) {
@@ -430,6 +446,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         pictureB = (ImageView) v.findViewById(R.id.pictureB);
         pictureC = (ImageView) v.findViewById(R.id.pictureC);
         pictureD = (ImageView) v.findViewById(R.id.pictureD);
+        pictureQuestion = (ImageView) v.findViewById(R.id.imgQuestion);
 
         rltTextAnswer = (RelativeLayout) v.findViewById(R.id.rltTextAnswer);
         rltSec = (RelativeLayout) v.findViewById(R.id.rltSec);
@@ -441,28 +458,38 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     // PERMISSION
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE &&
+        Log.d("xxx", "on request permission for result:" + requestCode);
+        if (isPickPictureCode(
+                requestCode) &&
                 grantResults.length > 0 &&
                 grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Intent i = new Intent(Intent.ACTION_PICK);
             i.setType("image/*");
-            startActivityForResult(i, PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE);
+            startActivityForResult(i, IntentCode.PICK_ANSWER_PICTURE_CODE);
+            Log.d("xxx", "start activity:" + requestCode);
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    private boolean isPickPictureCode(int code) {
+        return (code == IntentCode.PICK_ANSWER_PICTURE_CODE || code == IntentCode.PICTURE_QUESTION_PICTURE_CODE);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_PICTURE_FROM_FILE_EXPLORE_REQUEST_CODE && resultCode == getActivity().RESULT_OK && data != null) {
+        if (
+                isPickPictureCode(requestCode) &&
+                        resultCode == getActivity().RESULT_OK &&
+                        data != null) {
             Uri filePath = data.getData();
-            questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
-            try {
-                InputStream inputStream = getActivity().getContentResolver().openInputStream(filePath);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                interactingPicture.setImageBitmap(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            QuestionFormData.setQuestionImageUri(filePath);
+
+            if (requestCode == IntentCode.PICK_ANSWER_PICTURE_CODE)
+                questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
+            else if (requestCode == IntentCode.PICTURE_QUESTION_PICTURE_CODE)
+                questionPictureManager.setQuestionUri(filePath);
+            Helper.setImageViewImageByUri(getActivity(), interactingPicture, filePath);
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -534,6 +561,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         QuestionFormData.setQuestion(item);
         txtQuestion.setText(item.getQuestion());
         ((RadioButton) radioGroupAnswerType.getChildAt(getTypePos(item.getAnswerType()))).setChecked(true);
+        Helper.hideKeyboard(getCalledActivity());
         if (item.getIsVoiceAnswer()) {
             setVoiceAnswerView();
             solveVisibility("voice");
@@ -574,6 +602,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     private void onUpdateItemCallBack(Question item) {
+        Helper.hideKeyboard(getActivity());
         this.item = item;
         initQuestionPictureManager();
         resetLayoutAndParams(item.getAnswerType());
@@ -673,18 +702,42 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     public void onAddQuestionDialogDismiss() {
         Toast.makeText(getCalledActivity(), "add question dismiss", Toast.LENGTH_SHORT).show();
+        solveQuestionVisibility();
         switch (QuestionFormData.getQuestionType()) {
             case "text":
                 txtQuestion.setText(QuestionFormData.getQuestionText());
                 break;
             case "picture":
+                break;
             case "audio":
+                break;
+        }
+    }
+
+    private void solveQuestionVisibility() {
+        switch (QuestionFormData.getQuestionType()) {
+            case "text":
+                txtQuestion.setVisibility(View.VISIBLE);
+                pictureQuestion.setVisibility(View.GONE);
+                break;
+            case "picture":
+                txtQuestion.setVisibility(View.GONE);
+                pictureQuestion.setVisibility(View.VISIBLE);
+                break;
+            case "audio":
+                break;
         }
     }
 
     private void showAddQuestionDialog() {
         AddQuestionDialogFragment dialog = new AddQuestionDialogFragment();
         dialog.show(getFragmentManager(), "add-question-dialog");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    public void onPickQuestionPicture() {
+        interactingPicture = pictureQuestion;
+        requestPermissionForReadExternalStorage(IntentCode.PICTURE_QUESTION_PICTURE_CODE);
     }
 
 }

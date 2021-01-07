@@ -1,12 +1,15 @@
 package MainFragments;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -14,23 +17,33 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.multiple_choice.R;
 
 import Defines.FragmentCommunicate;
+import Defines.IntentCode;
 import Defines.Question;
 import Defines.QuestionFormData;
+import Helpers.Helper;
 
 public class AddQuestionDialogFragment extends DialogFragment {
 
     public static String fragmentName = "add-question-dialog";
     EditText edtQuestion;
-    RelativeLayout rltTextForm, textType, imageType, audioType;
+    ImageView pictureQuestion;
+    RelativeLayout rltTextForm, rltPictureForm, textType, imageType, audioType;
     FrameLayout frameVoiceForm;
     Dialog dialog;
     FragmentCommunicate fragmentCommunicate;
+
+    boolean isAudioTypeClicked = false;
+    boolean isPictureTypeClicked = false;
+    boolean isTextTypeClicked = false;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -47,6 +60,16 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
     private void initEvents() {
         initQuestionTypeClick();
+        initPictureQuestionClick();
+    }
+
+    private void initPictureQuestionClick(){
+        pictureQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickQuestionPicture();
+            }
+        });
     }
 
     private void initQuestionTypeClick() {
@@ -54,12 +77,16 @@ public class AddQuestionDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 onQuestionTypeClick("text");
+                if (!isTextTypeClicked) edtQuestion.setText(QuestionFormData.getQuestionText());
             }
         });
         imageType.setOnClickListener(new View.OnClickListener() {
-            @Override
             public void onClick(View v) {
                 onQuestionTypeClick("picture");
+                if (!isPictureTypeClicked) setPictureQuestionIfExist();
+                if (QuestionFormData.getQuestionImageUri() == null) {
+                    pickQuestionPicture();
+                }
             }
         });
         audioType.setOnClickListener(new View.OnClickListener() {
@@ -70,8 +97,14 @@ public class AddQuestionDialogFragment extends DialogFragment {
         });
     }
 
+    private void pickQuestionPicture(){
+        dialog.dismiss();
+        fragmentCommunicate.communicate("on-picture-type-click", AddQuestionDialogFragment.fragmentName);
+    }
+
     private void onQuestionTypeClick(String type) {
         QuestionFormData.setQuestionType(type);
+        solveFormVisibility();
     }
 
     private Question getQuestion() {
@@ -79,6 +112,8 @@ public class AddQuestionDialogFragment extends DialogFragment {
     }
 
     private void initForm() {
+        setIsTypeClicked(QuestionFormData.getQuestionType());
+        solveFormVisibility();
         switch (QuestionFormData.getQuestionType()) {
             case "text":
                 Toast.makeText(getActivity(), "text question", Toast.LENGTH_SHORT).show();
@@ -95,19 +130,42 @@ public class AddQuestionDialogFragment extends DialogFragment {
         }
     }
 
+    private void solveFormVisibility() {
+        switch (QuestionFormData.getQuestionType()) {
+            case "text":
+                rltTextForm.setVisibility(View.VISIBLE);
+                rltPictureForm.setVisibility(View.GONE);
+                frameVoiceForm.setVisibility(View.GONE);
+                break;
+            case "picture":
+                rltPictureForm.setVisibility(View.VISIBLE);
+                rltTextForm.setVisibility(View.GONE);
+                frameVoiceForm.setVisibility(View.GONE);
+                break;
+            case "audio":
+                frameVoiceForm.setVisibility(View.VISIBLE);
+                rltTextForm.setVisibility(View.GONE);
+                rltPictureForm.setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    // INIT FORM
     private void initTextForm() {
         edtQuestion.setText(QuestionFormData.getQuestionText());
         edtQuestion.requestFocus();
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-        if (getQuestion() != null) {
-        } else {
-
-        }
     }
 
     private void initImageForm() {
+        setPictureQuestionIfExist();
+    }
 
+    private void setPictureQuestionIfExist() {
+        if (QuestionFormData.getQuestionImageUri() != null) {
+            Helper.setImageViewImageByUri(getActivity(), pictureQuestion, QuestionFormData.getQuestionImageUri());
+        }
     }
 
     private void initAudioForm() {
@@ -117,7 +175,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
     private void initEditForm() {
         switch (QuestionFormData.getQuestionType()) {
             case "text":
-                showKeyboard();
+                Helper.showKeyboard(edtQuestion, getActivity());
                 edtQuestion.setText(QuestionFormData.getQuestionText());
                 break;
             case "picture":
@@ -126,16 +184,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
                 break;
         }
     }
-
-    private void initAddForm() {
-
-    }
-
-    private void showKeyboard() {
-        edtQuestion.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-    }
+    //
 
     private void initDialog() {
         fragmentCommunicate = (FragmentCommunicate) getActivity();
@@ -146,7 +195,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
         // Setting dialog window
         Window window = dialog.getWindow();
-        window.setGravity(Gravity.BOTTOM);
+        if (QuestionFormData.getQuestionType().equals("text")) window.setGravity(Gravity.BOTTOM);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         // set width
@@ -161,10 +210,13 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
     private void mapping() {
         rltTextForm = (RelativeLayout) dialog.findViewById(R.id.textForm);
+        rltPictureForm = (RelativeLayout) dialog.findViewById(R.id.pictureForm);
         edtQuestion = (EditText) dialog.findViewById(R.id.edtQuestion);
         textType = (RelativeLayout) dialog.findViewById(R.id.textType);
         audioType = (RelativeLayout) dialog.findViewById(R.id.audioType);
         imageType = (RelativeLayout) dialog.findViewById(R.id.imageType);
+        pictureQuestion = (ImageView) dialog.findViewById(R.id.pictureQuestion);
+        frameVoiceForm = (FrameLayout) dialog.findViewById(R.id.frameVoiceForm);
     }
 
     @Override
@@ -172,6 +224,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
         super.onDismiss(dialog);
         setDataWhenDismiss();
         fragmentCommunicate.communicate("dismiss", AddQuestionDialogFragment.fragmentName);
+        Helper.hideKeyboard(getActivity());
     }
 
     private void setDataWhenDismiss() {
@@ -183,5 +236,11 @@ public class AddQuestionDialogFragment extends DialogFragment {
             case "audio":
                 break;
         }
+    }
+
+    private void setIsTypeClicked(String type) {
+        if (type.equals("text")) isTextTypeClicked = true;
+        else if (type.equals("picture")) isPictureTypeClicked = true;
+        else if (type.equals("audio")) isAudioTypeClicked = true;
     }
 }

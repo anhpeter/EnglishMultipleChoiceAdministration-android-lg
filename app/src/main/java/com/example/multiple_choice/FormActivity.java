@@ -1,12 +1,16 @@
 package com.example.multiple_choice;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.google.rpc.Help;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,11 +86,14 @@ public class FormActivity extends Activity implements FragmentCommunicate {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void communicate(String event, String fromFragment) {
         if (fromFragment.equals(AddQuestionDialogFragment.fragmentName)) {
             if (event.equals("dismiss")) {
-               questionFormFragment.onAddQuestionDialogDismiss();
+                questionFormFragment.onAddQuestionDialogDismiss();
+            } else if (event.equals("on-picture-type-click")) {
+                questionFormFragment.onPickQuestionPicture();
             }
         }
     }
@@ -96,5 +103,11 @@ public class FormActivity extends Activity implements FragmentCommunicate {
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
         } else super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Helper.hideKeyboard(this);
     }
 }
