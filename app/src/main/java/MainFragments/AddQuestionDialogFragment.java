@@ -251,7 +251,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
         // Setting dialog window
         Window window = dialog.getWindow();
-        if (QuestionFormData.isTextQuestion() || QuestionFormData.isAudioQuestion()) window.setGravity(Gravity.BOTTOM);
+        if (!QuestionFormData.getQuestionType().equals("picture")) window.setGravity(Gravity.BOTTOM);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         // set width

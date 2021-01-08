@@ -652,7 +652,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
         // SET TIME LIMIT
         updateSecText(QuestionFormData.getTimeLimit());
-        Log.d("xxx", "sec: " + item.getTimeLimit());
 
         // QUESTION VIEW
         switch (item.getQuestionType()) {
