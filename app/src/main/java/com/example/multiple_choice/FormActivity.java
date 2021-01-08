@@ -1,29 +1,20 @@
 package com.example.multiple_choice;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.google.rpc.Help;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
-import Defines.FragmentCommunicate;
-import Defines.ICallback;
-import Defines.Question;
+import Interfaces.FragmentCommunicate;
 import Helpers.Helper;
 import MainFragments.AddQuestionDialogFragment;
-import MainFragments.IndexTitleBarFragment;
 import MainFragments.QuestionFormFragment;
 import MainFragments.QuestionFormTitleBarFragment;
-import MainFragments.QuestionIndexFragment;
+import MainFragments.SecDialogFragment;
 
 public class FormActivity extends Activity implements FragmentCommunicate {
 
@@ -94,6 +85,10 @@ public class FormActivity extends Activity implements FragmentCommunicate {
                 questionFormFragment.onAddQuestionDialogDismiss();
             } else if (event.equals("on-picture-type-click")) {
                 questionFormFragment.onPickQuestionPicture();
+            }
+        } else if (fromFragment.equals(SecDialogFragment.fragmentName)) {
+            if (event.equals("dismiss")) {
+                questionFormFragment.onSecDialogDismiss();
             }
         }
     }

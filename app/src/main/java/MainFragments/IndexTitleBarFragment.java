@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,14 +20,12 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
-import com.example.multiple_choice.Activity;
 import com.example.multiple_choice.LoginActivity;
-import com.example.multiple_choice.MainActivity;
 import com.example.multiple_choice.R;
 
 import java.util.HashMap;
 
-import Defines.FragmentCommunicate;
+import Interfaces.FragmentCommunicate;
 import Defines.Question;
 import Helpers.Helper;
 

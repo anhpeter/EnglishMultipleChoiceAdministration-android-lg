@@ -1,12 +1,9 @@
 package MainFragments;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
 import android.speech.tts.TextToSpeech;
@@ -17,24 +14,18 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import com.example.multiple_choice.R;
-import com.google.rpc.Help;
 import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 
-import Defines.FragmentCommunicate;
-import Defines.IntentCode;
+import Interfaces.FragmentCommunicate;
 import Defines.Question;
 import Defines.QuestionFormData;
 import Helpers.Helper;
@@ -113,7 +104,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
         });
     }
 
-    private void updateSpeakerStatus(){
+    private void updateSpeakerStatus() {
         String speech = edtSpeech.getText().toString();
         if (speech.trim() == "") {
             imgSpeaker.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.audio_icon_disabled));
@@ -194,15 +185,12 @@ public class AddQuestionDialogFragment extends DialogFragment {
         solveFormVisibility();
         switch (QuestionFormData.getQuestionType()) {
             case "text":
-                Toast.makeText(getActivity(), "text question", Toast.LENGTH_SHORT).show();
                 initTextForm();
                 break;
             case "picture":
-                Toast.makeText(getActivity(), "image question", Toast.LENGTH_SHORT).show();
                 initImageForm();
                 break;
             case "audio":
-                Toast.makeText(getActivity(), "audio question", Toast.LENGTH_SHORT).show();
                 initAudioForm();
                 break;
         }

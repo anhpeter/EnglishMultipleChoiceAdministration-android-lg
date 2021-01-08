@@ -4,16 +4,13 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
 
 
 import java.util.HashMap;
 
 import Defines.Auth;
-import Defines.FragmentCommunicate;
+import Interfaces.FragmentCommunicate;
 import Helpers.Helper;
 import MainFragments.IndexTitleBarFragment;
 import MainFragments.QuestionIndexFragment;

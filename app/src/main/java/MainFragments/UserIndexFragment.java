@@ -1,9 +1,7 @@
 package MainFragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +14,11 @@ import com.example.multiple_choice.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import Defines.FragmentCommunicate;
-import Defines.ICallback;
+import Interfaces.FragmentCommunicate;
+import Interfaces.ICallback;
 import Defines.MyUser;
-import Defines.Question;
-import Defines.QuestionAdapter;
-import Defines.UserAdapter;
+import Adapter.UserAdapter;
 import Helpers.Helper;
-import Models.QuestionModel;
 import Models.UserModel;
 
 public class UserIndexFragment extends MyFragment implements ICallback<MyUser> {

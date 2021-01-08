@@ -2,26 +2,20 @@ package Models;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import Defines.ICallback;
+import Interfaces.ICallback;
 import Defines.MyUser;
-import Defines.Question;
 
 public class UserModel extends Model{
 

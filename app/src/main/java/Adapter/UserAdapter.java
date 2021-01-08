@@ -1,4 +1,4 @@
-package Defines;
+package Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,10 +10,10 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.multiple_choice.R;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.ArrayList;
 
+import Defines.MyUser;
 import Helpers.Helper;
 
 public class UserAdapter extends BaseAdapter {

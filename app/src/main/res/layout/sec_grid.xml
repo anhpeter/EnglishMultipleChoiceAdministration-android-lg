@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <Button
+            android:id="@+id/btn5Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="5 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn10Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="10 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn15Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="15 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn20Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="20 sec"
+            android:textAllCaps="false"></Button>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <Button
+            android:id="@+id/btn30Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="30 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn60Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="60 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn90Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="90 sec"
+            android:textAllCaps="false"></Button>
+
+        <Button
+            android:id="@+id/btn120Sec"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="120 sec"
+            android:textAllCaps="false"></Button>
+
+    </LinearLayout>
+</LinearLayout>

@@ -45,18 +45,84 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:scrollHorizontally="true"
+            android:textColor="@color/default_color"
             android:text="What would you like to drink?"
             android:textSize="16sp"></TextView>
+
+        <LinearLayout
+            android:id="@+id/rltDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtQuestion"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtQuestionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Q"
+                android:textColor="@color/default_color"
+                android:textSize="14sp"></TextView>
+
+            <ImageView
+                android:id="@+id/imgQuestionType"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginLeft="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/audio_icon" />
+
+            <TextView
+                android:id="@+id/txtAnswerLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="A"
+                android:textColor="@color/default_color"
+                android:textSize="14sp"></TextView>
+
+            <ImageView
+                android:id="@+id/imgAnswerType"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginLeft="4dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/pencil_icon"></ImageView>
+
+
+            <!--
+            <ImageView
+                android:id="@+id/imgTimeLimitIcon"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_marginLeft="20dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/blue_countdown"></ImageView>
+
+
+            <TextView
+                android:id="@+id/txtTimeLimit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="15 sec"
+                android:textColor="@color/blue"
+                android:textSize="14sp"></TextView>
+            -->
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/txtAnswerType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
             android:layout_below="@+id/txtQuestion"
+
             android:text="Type: image"
             android:textColor="@color/blue"
-            android:textSize="14sp"></TextView>
+            android:textSize="14sp"
+            android:visibility="gone"></TextView>
     </RelativeLayout>
 
 </RelativeLayout>

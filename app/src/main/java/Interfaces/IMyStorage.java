@@ -1,4 +1,4 @@
-package Defines;
+package Interfaces;
 
 public interface IMyStorage {
     public void uploadedCallback(String url, int code);

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,6 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.Locale;
 
 import Defines.FontManager;
 
@@ -97,6 +99,15 @@ public class Helper {
         }
     }
 
+    public static int getIntByDataSnapshot(DataSnapshot snapshot, String key, int defaultValue) {
+        try {
+            String str = snapshot.child(key).getValue().toString();
+            return Integer.parseInt(str);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
     public static String getStringByDataSnapshot(DataSnapshot snapshot, String key, String defaultValue) {
         try {
             return snapshot.child(key).getValue().toString();
@@ -155,4 +166,5 @@ public class Helper {
     public static void clearImageView(ImageView img) {
         img.setImageResource(android.R.color.transparent);
     }
+
 }

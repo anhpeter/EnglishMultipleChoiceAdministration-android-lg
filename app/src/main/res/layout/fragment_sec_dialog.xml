@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Time limit"
+        android:textColor="#fff"
+        android:textSize="18sp"
+        android:textStyle="bold"></TextView>
+
+    <RelativeLayout
+        android:id="@+id/rltSecGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp">
+
+        <include layout="@layout/sec_grid"></include>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnDone"
+        android:layout_width="125dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/rltSecGrid"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/save_button"
+        android:text="Done"
+        android:textAllCaps="false"
+        android:textColor="#fff"
+        android:textStyle="bold"
+
+        ></Button>
+
+
+</RelativeLayout>

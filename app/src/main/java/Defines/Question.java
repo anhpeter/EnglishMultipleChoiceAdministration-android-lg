@@ -15,6 +15,7 @@ import Helpers.Helper;
 
 public class Question {
     private static String[] levelArr = {"easy", "normal", "hard", "memes", "games"};
+    public static int defaultTimeLimit = 15;
     private String id;
     private String question;
     private String correctAnswer;
@@ -23,6 +24,8 @@ public class Question {
     private String answerC;
     private String answerD;
     private String level; // hard | medium | easy
+    private int timeLimit;
+
 
     // type
     private boolean isImageQuestion;
@@ -34,7 +37,7 @@ public class Question {
     private long lastInteracted;
 
 
-    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isAudioQuestion, boolean isVoiceAnswer, boolean isImageAnswer) {
+    public Question(String id, String question, String correctAnswer, String answerA, String answerB, String answerC, String answerD, String level, long created, long lastInteracted, boolean isImageQuestion, boolean isAudioQuestion, boolean isVoiceAnswer, boolean isImageAnswer, int timeLimit) {
         this.setId(id);
         this.setQuestion(question);
         this.setAnswerA(answerA);
@@ -49,6 +52,7 @@ public class Question {
         this.setImageAnswer(isImageAnswer);
         this.setVoiceAnswer(isVoiceAnswer);
         this.setIsAudioQuestion(isAudioQuestion);
+        this.setTimeLimit(timeLimit);
     }
 
     public String getQuestion() {
@@ -143,11 +147,12 @@ public class Question {
                 boolean isImageQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsImageQuestion", false);
                 boolean isVoiceAnswer = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsVoiceAnswer", false);
                 boolean isAudioQuestion = Helper.getBooleanByDataSnapshot(dataSnapshot, "IsAudioQuestion", false);
+                int timeLimit = Helper.getIntByDataSnapshot(dataSnapshot, "TimeLimit", Question.defaultTimeLimit);
                 String categoryId = dataSnapshot.child("CategoryId").getValue().toString();
                 String level = getLevelByCategoryId(categoryId);
                 long created = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "Created", "-1"));
                 long lastInteracted = Long.parseLong(Helper.getStringByDataSnapshot(dataSnapshot, "LastInteracted", "-1"));
-                Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer, isImageAnswer);
+                Question qt = new Question(id, question, correctAnswer, answerA, answerB, answerC, answerD, level, created, lastInteracted, isImageQuestion, isAudioQuestion, isVoiceAnswer, isImageAnswer, timeLimit);
                 return qt;
             } catch (Exception e) {
                 String id = dataSnapshot.getKey();
@@ -173,6 +178,7 @@ public class Question {
         docData.put("IsAudioQuestion", getIsAudioQuestion() + "");
         docData.put("IsImageAnswer", getIsImageAnswer() + "");
         docData.put("IsVoiceAnswer", getIsVoiceAnswer() + "");
+        docData.put("TimeLimit", getTimeLimit() + "");
         showInfo();
         return docData;
     }
@@ -297,6 +303,15 @@ public class Question {
         setIsAudioQuestion(value.equals("audio"));
         setIsImageQuestion(value.equals("picture"));
     }
+
+    public int getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(int timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+
 
     public void showInfo() {
         Log.d("ppp", "image answer:" + getIsImageAnswer() + ";voice answer:" + getIsVoiceAnswer() + ";answer type:" + getAnswerType());

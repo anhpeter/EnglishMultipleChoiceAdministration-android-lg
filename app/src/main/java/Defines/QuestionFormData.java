@@ -8,8 +8,7 @@ public class QuestionFormData {
     private static Question question;
     private static String questionText;
     private static String questionSpeech;
-
-
+    private static int timeLimit = Question.defaultTimeLimit;
     private static String questionImageFilePath;
     private static Uri questionImageUri;
     private static MediaRecorder questionRecorder;
@@ -23,6 +22,7 @@ public class QuestionFormData {
         questionRecorder = null;
         questionImageFilePath = null;
         questionType = "text";
+        timeLimit = Question.defaultTimeLimit;
 
     }
 
@@ -66,6 +66,7 @@ public class QuestionFormData {
     public static void setQuestion(Question question) {
         QuestionFormData.question = question;
         setQuestionType(question.getQuestionType());
+        setTimeLimit(question.getTimeLimit());
         switch (question.getQuestionType()) {
             case "text":
                 setQuestionText(question.getQuestion());
@@ -109,5 +110,13 @@ public class QuestionFormData {
 
     public static void setQuestionSpeech(String questionSpeech) {
         QuestionFormData.questionSpeech = questionSpeech;
+    }
+
+    public static int getTimeLimit() {
+        return timeLimit;
+    }
+
+    public static void setTimeLimit(int timeLimit) {
+        QuestionFormData.timeLimit = timeLimit;
     }
 }

@@ -1,6 +1,5 @@
 package Helpers;
 
-import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.util.Log;
@@ -15,7 +14,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import Defines.IMyStorage;
+import Interfaces.IMyStorage;
 
 public class MyStorage {
     FirebaseStorage storage = FirebaseStorage.getInstance();
