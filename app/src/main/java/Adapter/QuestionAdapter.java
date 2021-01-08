@@ -88,6 +88,9 @@ public class QuestionAdapter extends BaseAdapter {
             case "audio":
                 img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.audio_icon));
                 break;
+            case "voice":
+                img.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.mic));
+                break;
         }
     }
 

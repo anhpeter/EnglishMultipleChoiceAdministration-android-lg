@@ -62,7 +62,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     TextView txtUploadProgress, txtQuestion, txtSec;
     RadioButton radioPictureA, radioPictureB, radioPictureC, radioPictureD;
     ImageView pictureA, pictureB, pictureC, pictureD, pictureQuestion, imgSpeaker;
-    RelativeLayout rltSec, rltTextAnswer, rltPictureAnswer, rltUploadProgress, rltTxtQuestion;
+    RelativeLayout rltSec, rltTextAnswer, rltPictureAnswer, rltUploadProgress, rltTxtQuestion, rltAnswer;
     Button btnSubmit;
     ProgressBar progressUpload;
     private boolean isPickingQuestionPicture = false;
@@ -454,6 +454,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         String id = params.get("id");
         formType = params.get("formType");
         if (formType.equals("edit") && id != null) {
+            rltAnswer.setVisibility(View.GONE);
             getItemById(id);
         } else initQuestionPictureManager();
     }
@@ -503,6 +504,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         pictureD = (ImageView) v.findViewById(R.id.pictureD);
         pictureQuestion = (ImageView) v.findViewById(R.id.imgQuestion);
 
+        rltAnswer = (RelativeLayout) v.findViewById(R.id.rltAnswer);
         rltTextAnswer = (RelativeLayout) v.findViewById(R.id.rltTextAnswer);
         rltTxtQuestion = (RelativeLayout) v.findViewById(R.id.rltTxtQuestion);
         rltSec = (RelativeLayout) v.findViewById(R.id.rltSec);
@@ -650,7 +652,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
         // SET TIME LIMIT
         updateSecText(QuestionFormData.getTimeLimit());
-        Log.d("xxx", "sec: "+item.getTimeLimit());
+        Log.d("xxx", "sec: " + item.getTimeLimit());
 
         // QUESTION VIEW
         switch (item.getQuestionType()) {
@@ -677,6 +679,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                 setVoiceAnswerView();
                 break;
         }
+        rltAnswer.setVisibility(View.VISIBLE);
         initQuestionPictureManager();
     }
 

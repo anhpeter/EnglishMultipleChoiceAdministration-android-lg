@@ -96,6 +96,10 @@ public class QuestionFormData {
         return result;
     }
 
+    public static boolean isTextQuestion() {
+        return (!isAudioQuestion() && !isTextQuestion());
+    }
+
     public static String getQuestionImageFilePath() {
         return questionImageFilePath;
     }
