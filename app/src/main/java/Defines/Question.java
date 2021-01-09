@@ -138,6 +138,9 @@ public class Question {
 
                 String id = dataSnapshot.getKey();
                 String question = dataSnapshot.child("Question").getValue().toString();
+                if (question.isEmpty()) {
+                    Log.d("xxx", "doc err: " + id);
+                }
                 String correctAnswer = dataSnapshot.child("CorrectAnswer").getValue().toString();
                 String answerA = dataSnapshot.child("A").getValue().toString();
                 String answerB = dataSnapshot.child("B").getValue().toString();

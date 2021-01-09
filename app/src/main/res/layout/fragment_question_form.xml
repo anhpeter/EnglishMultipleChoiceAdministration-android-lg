@@ -80,7 +80,8 @@
             android:layout_height="150dp"
             android:background="@color/light"
             android:scaleType="fitCenter"
-            android:visibility="gone"></ImageView>
+            android:visibility="gone"
+            android:src="@drawable/no_image"></ImageView>
 
 
     </RelativeLayout>
@@ -105,8 +106,7 @@
         <RelativeLayout
             android:id="@+id/rltAnswer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
             <!-- TEXT ANSWER -->
             <include layout="@layout/text_answer" />
 

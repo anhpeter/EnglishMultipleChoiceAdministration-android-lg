@@ -106,7 +106,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
 
     private void updateSpeakerStatus() {
         String speech = edtSpeech.getText().toString();
-        if (speech.trim() == "") {
+        if (speech.trim().equals("")) {
             imgSpeaker.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.audio_icon_disabled));
         } else {
             imgSpeaker.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.black_audio_icon));
@@ -118,7 +118,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 String speech = edtSpeech.getText().toString();
-                if (speech.trim() != "") {
+                if (!speech.trim().equals("")) {
                     int speechStatus = tts.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
                     if (speechStatus == TextToSpeech.ERROR) {
                         Log.e("xxx", "Error in converting Text to Speech!");
@@ -149,7 +149,7 @@ public class AddQuestionDialogFragment extends DialogFragment {
             public void onClick(View v) {
                 if (!isPictureTypeClicked) setPictureQuestionIfExist();
                 if (QuestionFormData.getQuestionImageUri() == null && QuestionFormData.getQuestionImageFilePath() == null) {
-                    pickQuestionPicture();
+                    //pickQuestionPicture();
                 }
                 onQuestionTypeClick("picture");
             }

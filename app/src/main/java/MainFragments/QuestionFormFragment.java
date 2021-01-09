@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import Defines.Message;
 import Interfaces.FragmentCommunicate;
 import Interfaces.ICallback;
 import Interfaces.IMyStorage;
@@ -45,7 +46,7 @@ import Models.QuestionModel;
 
 public class QuestionFormFragment extends MyFragment implements ICallback<Question>, IMyStorage {
 
-    String fragmentName = "question-form";
+    public static String fragmentName = "question-form";
     FragmentCommunicate fragmentCommunicate;
     QuestionModel questionModel;
     TextToSpeech tts;
@@ -138,7 +139,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             @Override
             public void onClick(View v) {
                 String speech = txtQuestion.getText().toString();
-                if (speech.trim() != "") {
+                if (!speech.trim().equals("")) {
                     int speechStatus = tts.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
                     if (speechStatus == TextToSpeech.ERROR) {
                         Log.e("xxx", "Error in converting Text to Speech!");
@@ -294,12 +295,14 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         if (isVoiceAnswerSelected(saveParams)) {
             onReallySaveTextAnswer(saveParams);
         } else {
-            if (isTextQuestionOptionValid()) {
+            String errMessage = getFormErrorMessage();
+            Log.d("xxx", "form err msg: " + errMessage);
+            if (errMessage.trim().equals("")) {
                 onReallySaveTextAnswer(saveParams);
             } else {
-                showInValidMessage();
+                Helper.showMessage(getActivity(), errMessage);
+                isSaving = false;
             }
-
         }
     }
 
@@ -362,16 +365,21 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     private void onSavePictureAnswer() {
-        if (isOtherOptionValid() && questionPictureManager.isAnswerUriValid()) {
-            totalUpload = questionPictureManager.getTotalUpload();
-            if (totalUpload > 0) {
-                rltUploadProgress.setVisibility(View.VISIBLE);
-                questionPictureManager.uploadAll(QuestionFormFragment.this);
+        if (isQuestionValid()) {
+            if (questionPictureManager.isAnswerUriValid()) {
+                totalUpload = questionPictureManager.getTotalUpload();
+                if (totalUpload > 0) {
+                    rltUploadProgress.setVisibility(View.VISIBLE);
+                    questionPictureManager.uploadAll(QuestionFormFragment.this);
+                } else {
+                    savePictureAnswer();
+                }
             } else {
-                savePictureAnswer();
+                Helper.showMessage(getActivity(), Message.answersRequired);
             }
         } else {
-            showInValidMessage();
+            Helper.showMessage(getActivity(), Message.questionRequired);
+            isSaving = false;
         }
     }
 
@@ -390,30 +398,41 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         questionModel.addItem(question, "add-item");
     }
 
-    private boolean isTextQuestionOptionValid() {
+    private String getFormErrorMessage() {
+        String message = "";
         String answerA = edtAnswerA.getText().toString().trim();
         String answerB = edtAnswerB.getText().toString().trim();
         String answerC = edtAnswerC.getText().toString().trim();
         String answerD = edtAnswerD.getText().toString().trim();
-        if (
-                isOtherOptionValid() &&
-                        !answerA.trim().isEmpty() &&
-                        !answerB.trim().isEmpty() &&
-                        !answerC.trim().isEmpty() &&
-                        !answerD.trim().isEmpty()
-        ) return true;
-        return false;
+        if (!isQuestionValid()) {
+            message = Message.questionRequired;
+        } else if (
+                answerA.trim().isEmpty() ||
+                        answerB.trim().isEmpty() ||
+                        answerC.trim().isEmpty() ||
+                        answerD.trim().isEmpty()
+        ) {
+            message = Message.answersRequired;
+        } else {
+        }
+        return message;
     }
 
-    private boolean isOtherOptionValid() {
-        HashMap<String, String> saveParams = getSaveParams();
-        if (
-                !saveParams.get("answerType").isEmpty() &&
-                        !saveParams.get("level").isEmpty() &&
-                        !saveParams.get("correctAnswerInLetter").trim().isEmpty()
-        ) return true;
-        return false;
+    private boolean isQuestionValid() {
+        boolean result = false;
+        switch (QuestionFormData.getQuestionType()) {
+            case "audio":
+            case "text":
+                if (QuestionFormData.isQuestionTextValid()) result = true;
+                break;
+            case "picture":
+                if (QuestionFormData.getQuestionImageFilePath() != null || QuestionFormData.getQuestionImageUri() != null)
+                    result = true;
+                break;
+        }
+        return result;
     }
+
 
     private String getQuestionLevelValue() {
         String result = getCalledActivity().getQuestionLevel();
@@ -535,20 +554,23 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("xxx", "request code: " + requestCode);
-        if (
-                isPickPictureCode(requestCode) &&
-                        resultCode == getActivity().RESULT_OK &&
-                        data != null) {
-            Uri filePath = data.getData();
-            QuestionFormData.setQuestionImageUri(filePath);
+        if (isPickPictureCode(requestCode)) {
+            if (resultCode == getActivity().RESULT_OK && data != null) {
+                Uri filePath = data.getData();
+                QuestionFormData.setQuestionImageUri(filePath);
 
-            if (!isPickingQuestionPicture) {
-                questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
-            } else {
-                questionPictureManager.setQuestionUri(filePath);
+                if (!isPickingQuestionPicture) {
+                    questionPictureManager.setUriByIndex(getAnswerPosByImageViewId(interactingPicture.getId()), filePath);
+                } else {
+                    questionPictureManager.setQuestionUri(filePath);
+                }
+                Helper.setImageViewImageByUri(getActivity(), interactingPicture, filePath);
             }
-            Helper.setImageViewImageByUri(getActivity(), interactingPicture, filePath);
-
+        } else {
+            if (QuestionFormData.getQuestionImageFilePath() != null)
+                Picasso.get().load(QuestionFormData.getQuestionImageFilePath()).into(pictureQuestion);
+            else
+                pictureQuestion.setImageResource(R.drawable.no_image);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -644,11 +666,12 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
     private void onGetEditItemCallBack(Question item) {
         this.item = item;
+        fragmentCommunicate.communicate("on-edit-item-callback", QuestionFormFragment.fragmentName);
         QuestionFormData.setQuestion(item);
         ((RadioButton) radioGroupAnswerType.getChildAt(getTypePos(item.getAnswerType()))).setChecked(true);
-        Helper.hideKeyboard(getCalledActivity());
         solveQuestionVisibility(item.getQuestionType());
         solveAnswerVisibility(item.getAnswerType());
+        Helper.hideKeyboard(getCalledActivity());
 
         // SET TIME LIMIT
         updateSecText(QuestionFormData.getTimeLimit());
@@ -722,17 +745,19 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     }
 
     private void onUpdateItemCallBack(Question item) {
-        Helper.hideKeyboard(getActivity());
         this.item = item;
         initQuestionPictureManager();
         resetLayoutAndParams(item.getAnswerType());
         Toast.makeText(getActivity(), "Item  updated", Toast.LENGTH_SHORT).show();
         isSaving = false;
+        Helper.hideKeyboard(getActivity());
     }
 
     private void onAddItemCallBack(Question item) {
         Toast.makeText(getActivity(), "Item  added", Toast.LENGTH_SHORT).show();
         resetAll();
+        QuestionFormData.prepare();
+        isSaving = false;
     }
 
     private void onDeleteItemCallback() {
@@ -784,8 +809,8 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             pictureB.setImageResource(R.drawable.add_picture);
             pictureC.setImageResource(R.drawable.add_picture);
             pictureD.setImageResource(R.drawable.add_picture);
-            rltUploadProgress.setVisibility(View.GONE);
         }
+        rltUploadProgress.setVisibility(View.GONE);
         setDefaultPictureAnswerParams();
     }
 
@@ -795,17 +820,14 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         pictureB.setImageResource(R.drawable.add_picture);
         pictureC.setImageResource(R.drawable.add_picture);
         pictureD.setImageResource(R.drawable.add_picture);
+        pictureQuestion.setImageResource(R.drawable.no_image);
         rltUploadProgress.setVisibility(View.GONE);
         txtQuestion.setText("");
         edtAnswerA.setText("");
         edtAnswerB.setText("");
         edtAnswerC.setText("");
         edtAnswerD.setText("");
-    }
-
-    public void showInValidMessage() {
-        isSaving = false;
-        Toast.makeText(getActivity(), "Invalid data", Toast.LENGTH_SHORT).show();
+        Helper.hideKeyboard(getActivity());
     }
 
     public void setDefaultPictureAnswerParams() {
@@ -886,7 +908,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         }
     }
 
-
     // SEC DIALOG
     private void showSecDialog() {
         SecDialogFragment dialog = new SecDialogFragment();
@@ -900,6 +921,4 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     public void updateSecText(int sec) {
         txtSec.setText(sec + " sec");
     }
-
-
 }

@@ -25,6 +25,7 @@ public class QuestionFormTitleBarFragment extends Fragment{
     String id;
     String formType;
     FragmentCommunicate fragmentCommunicate;
+    boolean isItemReceived = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,5 +104,12 @@ public class QuestionFormTitleBarFragment extends Fragment{
     private void mapping() {
         btnBack = (Button) v.findViewById(R.id.btnBack);
         btnDelete = (Button) v.findViewById(R.id.btnDelete);
+    }
+
+    public void onEditItemCallback(){
+        if (!isItemReceived){
+            btnDelete.setVisibility(View.VISIBLE);
+            isItemReceived = true;
+        }
     }
 }

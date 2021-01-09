@@ -23,6 +23,16 @@ public class QuestionFormData {
         questionImageFilePath = null;
         questionType = "text";
         timeLimit = Question.defaultTimeLimit;
+    }
+
+    public static void prepare() {
+        question = null;
+        questionText = null;
+        questionSpeech = null;
+        questionImageUri = null;
+        questionRecorder = null;
+        questionImageFilePath = null;
+        timeLimit = Question.defaultTimeLimit;
 
     }
 
@@ -64,7 +74,6 @@ public class QuestionFormData {
     }
 
     public static void setQuestion(Question question) {
-        QuestionFormData.question = question;
         setQuestionType(question.getQuestionType());
         setTimeLimit(question.getTimeLimit());
         switch (question.getQuestionType()) {
@@ -122,5 +131,13 @@ public class QuestionFormData {
 
     public static void setTimeLimit(int timeLimit) {
         QuestionFormData.timeLimit = timeLimit;
+    }
+
+    public static boolean isQuestionTextValid() {
+        boolean result = false;
+        if (getQuestionText() != null) {
+            if (!getQuestionText().trim().equals("")) result  =true;
+        }
+        return result;
     }
 }

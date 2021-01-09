@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.multiple_choice.R;
 import com.google.firebase.database.DataSnapshot;
@@ -118,7 +119,7 @@ public class Helper {
 
     public static String getUppercaseFirstCharacter(String string) {
         string = (string != null) ? string : "";
-        if (string.trim() != "") return (string.charAt(0) + "").toUpperCase();
+        if (!string.trim().equals("")) return (string.charAt(0) + "").toUpperCase();
         return string;
     }
 
@@ -165,6 +166,12 @@ public class Helper {
 
     public static void clearImageView(ImageView img) {
         img.setImageResource(android.R.color.transparent);
+    }
+
+    public static void showMessage(Activity activity, String message) {
+        if (!message.isEmpty()) {
+            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

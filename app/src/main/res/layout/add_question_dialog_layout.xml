@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearQuestionType"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        >
 
         <EditText
             android:id="@+id/edtQuestion"
@@ -29,30 +30,31 @@
 
     <!-- PICTURE -->
     <RelativeLayout
+        android:visibility="gone"
         android:id="@+id/pictureForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearQuestionType"
-        android:layout_marginTop="10dp"
-        android:visibility="gone">
+        android:layout_marginTop="10dp">
 
         <ImageView
             android:id="@+id/pictureQuestion"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:background="@color/light"
-            android:scaleType="fitCenter"></ImageView>
+            android:scaleType="fitCenter"
+            android:src="@drawable/add_picture"></ImageView>
 
     </RelativeLayout>
 
     <!-- AUDIO -->
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/audioForm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearQuestionType"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
 
         <EditText
             android:id="@+id/edtSpeech"

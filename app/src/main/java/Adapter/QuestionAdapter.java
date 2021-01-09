@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.example.multiple_choice.R;
+import com.google.api.Quota;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -67,7 +68,7 @@ public class QuestionAdapter extends BaseAdapter {
         } else holder = (QuestionAdapter.ViewHolder) convertView.getTag();
 
         Question question = questionArrayList.get(position);
-        holder.txtQuestion.setText(question.getQuestion());
+        solveTxtQuestion(holder, question);
         holder.txtAnswerType.setText("Type: " + question.getAnswerType());
         solveThumb(holder, question);
         showTypeIcon(holder.imgQuestionType, question.getQuestionType());
@@ -75,6 +76,15 @@ public class QuestionAdapter extends BaseAdapter {
         //holder.txtTimeLimit.setText(question.getTimeLimit()+" sec");
         animate(convertView);
         return convertView;
+    }
+
+    private void solveTxtQuestion(ViewHolder holder, Question question) {
+        if (question.getIsImageQuestion()){
+            holder.txtQuestion.setVisibility(View.GONE);
+        }else{
+            holder.txtQuestion.setText(question.getQuestion());
+            holder.txtQuestion.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showTypeIcon(ImageView img, String type) {

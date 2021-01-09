@@ -21,6 +21,7 @@ public class FormActivity extends Activity implements FragmentCommunicate {
     FragmentManager fragmentManager;
     HashMap<String, String> myParams;
     QuestionFormFragment questionFormFragment;
+    QuestionFormTitleBarFragment questionFormTitleBarFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,7 @@ public class FormActivity extends Activity implements FragmentCommunicate {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         // title bar
-        QuestionFormTitleBarFragment questionFormTitleBarFragment = new QuestionFormTitleBarFragment();
+        questionFormTitleBarFragment = new QuestionFormTitleBarFragment();
         questionFormTitleBarFragment.setArguments(b);
         fragmentTransaction.add(R.id.formTitleBarFrame, questionFormTitleBarFragment, "titleBar");
 
@@ -85,6 +86,10 @@ public class FormActivity extends Activity implements FragmentCommunicate {
                 questionFormFragment.onAddQuestionDialogDismiss();
             } else if (event.equals("on-picture-type-click")) {
                 questionFormFragment.onPickQuestionPicture();
+            }
+        } else if (fromFragment.equals(QuestionFormFragment.fragmentName)) {
+            if (event.equals("on-edit-item-callback")) {
+                questionFormTitleBarFragment.onEditItemCallback();
             }
         } else if (fromFragment.equals(SecDialogFragment.fragmentName)) {
             if (event.equals("dismiss")) {

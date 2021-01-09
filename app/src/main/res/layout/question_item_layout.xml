@@ -20,6 +20,7 @@
             android:text="W"
             android:textColor="#fff"></TextView>
 
+
         <ImageView
             android:id="@+id/imgThumb"
             android:layout_width="match_parent"
@@ -28,6 +29,8 @@
             android:gravity="center"
             android:scaleType="centerCrop"
             android:textColor="#fff"></ImageView>
+
+
     </RelativeLayout>
 
     <RelativeLayout
