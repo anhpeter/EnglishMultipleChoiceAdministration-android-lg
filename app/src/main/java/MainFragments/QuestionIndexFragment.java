@@ -119,7 +119,7 @@ public class QuestionIndexFragment extends MyFragment implements ICallback<Quest
 
     @Override
     public void listCallBack(ArrayList<Question> items, String tag) {
-        if (tag == "list-all") onListAllCallback(items);
+        if (tag.equals("list-all")) onListAllCallback(items);
     }
 
     private void onListAllCallback(ArrayList<Question> items) {

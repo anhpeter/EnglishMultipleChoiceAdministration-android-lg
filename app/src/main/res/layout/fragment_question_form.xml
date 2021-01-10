@@ -48,7 +48,8 @@
         <RelativeLayout
             android:id="@+id/rltTxtQuestion"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/txtQuestion"
@@ -80,8 +81,18 @@
             android:layout_height="150dp"
             android:background="@color/light"
             android:scaleType="fitCenter"
-            android:visibility="gone"
             android:src="@drawable/no_image"></ImageView>
+
+        <EditText
+            android:id="@+id/edtCorrectAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imgQuestion"
+            android:background="@drawable/custom_edit_text_2"
+            android:textCursorDrawable="@drawable/black_cursor"
+            android:gravity="center"
+
+            android:hint="Enter correct answer"></EditText>
 
 
     </RelativeLayout>

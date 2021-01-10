@@ -133,10 +133,19 @@ public class QuestionFormData {
         QuestionFormData.timeLimit = timeLimit;
     }
 
-    public static boolean isQuestionTextValid() {
+    public static boolean isQuestionValid() {
         boolean result = false;
-        if (getQuestionText() != null) {
-            if (!getQuestionText().trim().equals("")) result  =true;
+        switch (getQuestionType()) {
+            case "text":
+                if (getQuestionText() != null) {
+                    if (!getQuestionText().trim().equals("")) result = true;
+                }
+                break;
+            case "audio":
+                if (getQuestionSpeech() != null) {
+                    if (!getQuestionSpeech().trim().equals("")) result = true;
+                }
+                break;
         }
         return result;
     }

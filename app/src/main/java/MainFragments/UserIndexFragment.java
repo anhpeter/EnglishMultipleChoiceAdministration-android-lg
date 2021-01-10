@@ -98,7 +98,7 @@ public class UserIndexFragment extends MyFragment implements ICallback<MyUser> {
 
     @Override
     public void listCallBack(ArrayList<MyUser> items, String tag) {
-        if (tag == "list-all") onListAllCallback(items);
+        if (tag.equals("list-all")) onListAllCallback(items);
     }
 
 
