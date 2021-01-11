@@ -972,4 +972,11 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         if (QuestionFormData.getQuestionType().equals("picture") && getAnswerTypeSelected().equals("voice")) edtCorrectAnswer.setVisibility(View.VISIBLE);
         else edtCorrectAnswer.setVisibility(View.GONE);
     }
+
+    public void onBackPressed(){
+        Toast.makeText(getActivity(), "Back pressed", Toast.LENGTH_SHORT).show();
+        if (!isSaving){
+            onDestroy();
+        }
+    }
 }
