@@ -105,10 +105,6 @@ public class QuestionFormData {
         return result;
     }
 
-    public static boolean isTextQuestion() {
-        return (!isAudioQuestion() && !isTextQuestion());
-    }
-
     public static String getQuestionImageFilePath() {
         return questionImageFilePath;
     }
@@ -145,6 +141,9 @@ public class QuestionFormData {
                 if (getQuestionSpeech() != null) {
                     if (!getQuestionSpeech().trim().equals("")) result = true;
                 }
+                break;
+            case "picture":
+                if (getQuestionImageUri() != null) result = true;
                 break;
         }
         return result;

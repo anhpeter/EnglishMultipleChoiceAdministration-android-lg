@@ -2,10 +2,13 @@ package com.example.multiple_choice;
 
 import androidx.annotation.RequiresApi;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -100,10 +103,45 @@ public class FormActivity extends Activity implements FragmentCommunicate {
 
     @Override
     public void onBackPressed() {
+        if (!questionFormFragment.isSaving()) {
+            // normal
+            if (questionFormFragment.isFormChanged()) {
+                // form changed
+                showQuitDialog();
+            } else {
+                // form not changed
+                onQuit();
+            }
+        } else {
+            // saving
+            Toast.makeText(this, "Please wait for saving!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showQuitDialog() {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle("Are you sure?");
+        alertDialog.setMessage("Quit without saving?");
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                onQuit();
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void onQuit() {
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
-        } else super.onBackPressed();
+        } else onBackPressed();
     }
+
 
     @Override
     protected void onDestroy() {

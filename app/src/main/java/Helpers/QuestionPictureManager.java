@@ -174,6 +174,16 @@ public class QuestionPictureManager {
         return false;
     }
 
+    public boolean hasNewData() {
+        boolean result = (
+                getAnswerAUri() != null ||
+                        getAnswerBUri() != null ||
+                        getAnswerCUri() != null ||
+                        getAnswerDUri() != null
+        );
+        return result;
+    }
+
     public int getTotalUpload() {
         int count = 0;
         if (getAnswerAUri() != null) count++;
@@ -220,7 +230,7 @@ public class QuestionPictureManager {
 
     public void deleteQuestionIfExist() {
         MyStorage myStorage = MyStorage.getInstance();
-        if (getQuestionPath() != null){
+        if (getQuestionPath() != null) {
             myStorage.delete(getQuestionPath());
         }
     }

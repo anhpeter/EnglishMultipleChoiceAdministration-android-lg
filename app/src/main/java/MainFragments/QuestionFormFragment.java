@@ -69,6 +69,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
     private boolean isPickingQuestionPicture = false;
     private boolean isSaving = false;
 
+
     // VALUE ARRAY
     String typeValues[] = {"text", "picture", "voice"};
 
@@ -257,8 +258,8 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isSaving) {
-                    isSaving = true;
+                if (!isSaving()) {
+                    setSaving(true);
                     String answerTypeSelected = getAnswerTypeSelected();
                     switch (answerTypeSelected) {
                         case "picture":
@@ -303,7 +304,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                     onReallySaveTextAnswer(saveParams);
                 } else {
                     Helper.showMessage(getActivity(), Message.correctAnswerRequired);
-                    isSaving = false;
+                    setSaving(false);
                 }
             }
         } else {
@@ -313,7 +314,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                 onReallySaveTextAnswer(saveParams);
             } else {
                 Helper.showMessage(getActivity(), errMessage);
-                isSaving = false;
+                setSaving(false);
             }
         }
     }
@@ -397,7 +398,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             }
         } else {
             Helper.showMessage(getActivity(), Message.questionRequired);
-            isSaving = false;
+            setSaving(false);
         }
     }
 
@@ -457,7 +458,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         return result;
     }
 
-    private String getCorrectAnswerValue() {
+    private String getCorrectAnswerLetter() {
         String result = "";
         if (getAnswerTypeSelected().equals("text")) {
             int typeRadioButtonId = radioGroupCorrectAnswer.getCheckedRadioButtonId();
@@ -768,7 +769,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         initQuestionPictureManager();
         resetLayoutAndParams(item.getAnswerType());
         Toast.makeText(getActivity(), "Item  updated", Toast.LENGTH_SHORT).show();
-        isSaving = false;
+        setSaving(false);
         Helper.hideKeyboard(getActivity());
     }
 
@@ -776,7 +777,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         Toast.makeText(getActivity(), "Item  added", Toast.LENGTH_SHORT).show();
         resetAll();
         QuestionFormData.prepare();
-        isSaving = false;
+        setSaving(false);
     }
 
     private void onDeleteItemCallback() {
@@ -807,7 +808,7 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         String id = (formType.equals("edit")) ? item.getId() : null;
         String level = getQuestionLevelValue();
         String answerType = getAnswerTypeSelected();
-        String correctAnswer = getCorrectAnswerValue();
+        String correctAnswer = getCorrectAnswerLetter();
         saveParams.put("id", id);
         saveParams.put("level", level);
         saveParams.put("answerType", answerType);
@@ -964,19 +965,92 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
         txtSec.setText(sec + " sec");
     }
 
-    public void showCorrectAnswerEditText() {
-        edtCorrectAnswer.setVisibility(View.VISIBLE);
-    }
-
-    private void solveEdtCorrectAnswerVisibility(){
-        if (QuestionFormData.getQuestionType().equals("picture") && getAnswerTypeSelected().equals("voice")) edtCorrectAnswer.setVisibility(View.VISIBLE);
+    private void solveEdtCorrectAnswerVisibility() {
+        if (QuestionFormData.getQuestionType().equals("picture") && getAnswerTypeSelected().equals("voice"))
+            edtCorrectAnswer.setVisibility(View.VISIBLE);
         else edtCorrectAnswer.setVisibility(View.GONE);
     }
 
-    public void onBackPressed(){
-        Toast.makeText(getActivity(), "Back pressed", Toast.LENGTH_SHORT).show();
-        if (!isSaving){
-            onDestroy();
+    public boolean isFormChanged() {
+        boolean result = (isQuestionDataChanged() || isAnswerChanged());
+        return result;
+    }
+
+    private boolean isAnswerChanged() {
+        boolean result = (isTextAnswerDataChanged() || isPictureAnswerDataChanged() || isVoiceAnswerDataChanged());
+        return result;
+    }
+
+    private boolean isQuestionDataChanged() {
+        boolean result = false;
+        if (formType.equals("add")) {
+            result = QuestionFormData.isQuestionValid();
+        } else {
+            switch (QuestionFormData.getQuestionType()) {
+                case "text":
+                    if (item.getQuestionType().equals("text")) {
+                        String value = (QuestionFormData.getQuestionText() != null) ? QuestionFormData.getQuestionText() : "";
+                        result = !value.equals(item.getQuestion());
+                    }
+                    break;
+                case "audio":
+                    if (item.getQuestionType().equals("audio")) {
+                        String value = (QuestionFormData.getQuestionSpeech() != null) ? QuestionFormData.getQuestionSpeech() : "";
+                        result = !value.equals(item.getQuestion());
+                    }
+                    break;
+                case "picture":
+                    result = (questionPictureManager.getQuestionUri() != null);
+                    break;
+
+            }
         }
+        Log.d("xxx", "question changed: "+result);
+        return result;
+    }
+
+    private boolean isTextAnswerDataChanged() {
+        String answerA = edtAnswerA.getText().toString().trim();
+        String answerB = edtAnswerB.getText().toString().trim();
+        String answerC = edtAnswerC.getText().toString().trim();
+        String answerD = edtAnswerD.getText().toString().trim();
+        boolean result;
+        if (formType.equals("add")) {
+            result = (!answerA.isEmpty() || !answerB.isEmpty() || !answerC.isEmpty() || !answerD.isEmpty());
+        } else {
+            result = (
+                    !answerA.equals(item.getAnswerA()) ||
+                            !answerB.equals(item.getAnswerB()) ||
+                            !answerC.equals(item.getAnswerC()) ||
+                            !answerD.equals(item.getAnswerD())
+            );
+        }
+        Log.d("xxx", "text ans changed: "+result);
+        return result;
+    }
+
+    private boolean isPictureAnswerDataChanged() {
+        boolean result = questionPictureManager.hasNewData();
+        Log.d("xxx", "picture ans changed: "+result);
+        return result;
+    }
+
+    private boolean isVoiceAnswerDataChanged() {
+        boolean result = false;
+        if (QuestionFormData.getQuestionType().equals("picture")) {
+            String correctAnswer = edtCorrectAnswer.getText().toString().trim();
+            result = (!correctAnswer.isEmpty());
+        }
+        Log.d("xxx", "voice ans changed: "+result);
+        return result;
+    }
+
+    // GETTER & SETTER
+    public boolean isSaving() {
+        return isSaving;
+    }
+
+    public void setSaving(boolean saving) {
+        isSaving = saving;
     }
 }

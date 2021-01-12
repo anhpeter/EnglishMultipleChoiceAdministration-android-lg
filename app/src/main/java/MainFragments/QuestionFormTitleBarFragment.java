@@ -112,4 +112,5 @@ public class QuestionFormTitleBarFragment extends Fragment{
             isItemReceived = true;
         }
     }
+
 }
