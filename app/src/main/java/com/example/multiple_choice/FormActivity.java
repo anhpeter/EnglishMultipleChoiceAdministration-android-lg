@@ -139,7 +139,7 @@ public class FormActivity extends Activity implements FragmentCommunicate {
     private void onQuit() {
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
-        } else onBackPressed();
+        } else super.onBackPressed();
     }
 
 
