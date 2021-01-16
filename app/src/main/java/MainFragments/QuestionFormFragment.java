@@ -1005,7 +1005,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
 
             }
         }
-        Log.d("xxx", "question changed: "+result);
         return result;
     }
 
@@ -1025,13 +1024,11 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
                             !answerD.equals(item.getAnswerD())
             );
         }
-        Log.d("xxx", "text ans changed: "+result);
         return result;
     }
 
     private boolean isPictureAnswerDataChanged() {
         boolean result = questionPictureManager.hasNewData();
-        Log.d("xxx", "picture ans changed: "+result);
         return result;
     }
 
@@ -1041,7 +1038,6 @@ public class QuestionFormFragment extends MyFragment implements ICallback<Questi
             String correctAnswer = edtCorrectAnswer.getText().toString().trim();
             result = (!correctAnswer.isEmpty());
         }
-        Log.d("xxx", "voice ans changed: "+result);
         return result;
     }
 
